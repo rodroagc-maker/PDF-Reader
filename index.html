@@ -116,9 +116,10 @@ article.sans{font-family:var(--sans);}
 .blk.footnote .kindtag{margin-bottom:6px;}
 /* figuras y tablas: tarjeta con cabecera */
 figure{margin:1.6em 0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 10px 12px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
-figure .fighead{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:var(--sans);}
+figure .fighead{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-family:var(--sans);flex-wrap:wrap;}
+figure .fighead .kindtag,figure .fighead button{white-space:nowrap;}
 figure .fighead .spacer{flex:1;}
-figure .capbtn,figure .zoombtn{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 10px;background:var(--bg);}
+figure .capbtn,figure .zoombtn,figure .viewbtn{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:var(--bg);}
 figure .zoombtn{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);}
 figure .wrap{position:relative;}
 figure .fig{display:block;width:100%;height:auto;border-radius:8px;background:#fff;border:1px solid var(--line);}
@@ -132,11 +133,21 @@ figure .panelstrip button{flex:none;width:64px;height:64px;border-radius:8px;bor
 figure .panelstrip button b{position:absolute;left:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:1px 6px;border-radius:0 6px 0 0;font-family:var(--sans);}
 /* tablas HTML */
 .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:8px;background:var(--surface);}
-.tablewrap table{border-collapse:separate;border-spacing:0;font-family:var(--sans);font-size:.78em;line-height:1.35;width:max-content;min-width:100%;table-layout:auto;}
-.tablewrap th,.tablewrap td{padding:6px 9px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top;text-align:left;min-width:0;max-width:15em;background:var(--surface);}
-.tablewrap th{font-weight:700;background:var(--bg);max-width:7em;}
-.tablewrap tr.grp td{background:var(--bg);font-weight:700;color:var(--accent);}
-.tablewrap td:first-child,.tablewrap th:first-child{position:sticky;left:0;z-index:1;font-weight:600;max-width:11em;border-right:2px solid var(--line);}
+.tablewrap table{border-collapse:separate;border-spacing:0;font-family:var(--sans);font-size:.78em;line-height:1.35;width:max-content;min-width:100%;table-layout:fixed;}
+.tablewrap th,.tablewrap td{padding:6px 9px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top;text-align:left;background:var(--surface);white-space:pre-line;overflow-wrap:anywhere;}
+.tablewrap th{font-weight:700;background:var(--bg);}
+.tablewrap tr.grp td{background:var(--bg);font-weight:700;color:var(--accent);white-space:nowrap;}
+.tablewrap tr.grp .grpl{position:sticky;left:9px;}
+.tablewrap td:first-child,.tablewrap th:first-child{position:sticky;left:0;z-index:1;font-weight:600;border-right:2px solid var(--line);}
+/* vista tarjetas (tablas anchas): una tarjeta por fila, sin desplazamiento lateral */
+figure[data-view="cards"] .tablewrap{overflow:visible;border:0;background:none;}
+.cards{font-family:var(--sans);font-size:.82em;line-height:1.4;display:flex;flex-direction:column;gap:8px;}
+.cards .cgrp{font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;font-size:.85em;margin:6px 2px 0;}
+.cards .card{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 11px;}
+.cards .ctitle{font-weight:700;font-size:1.05em;margin-bottom:4px;white-space:pre-line;}
+.cards .cf{display:flex;flex-direction:column;padding:4px 0;border-top:1px dashed var(--line);}
+.cards .cl{font-size:.78em;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;}
+.cards .cv{white-space:pre-line;overflow-wrap:anywhere;}
 .tablewrap .hl{border-radius:2px;}
 .pagemark{text-align:right;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:1.4em 0 .4em;font-family:var(--sans);font-variant-numeric:tabular-nums;}
 .hl{border-radius:2px;padding:1px 0;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
@@ -863,7 +874,7 @@ function classify(blocks, body, pages) {
    ===================================================================== */
 const $ = (s, el = document) => el.querySelector(s);
 const AUTHOR = "Rodri";
-const APP_VERSION = "3.2";
+const APP_VERSION = "3.3";
 const COLORS = { yellow: [1, 0.89, 0.36], orange: [1, 0.62, 0.30], green: [0.62, 0.89, 0.61], blue: [0.61, 0.80, 1], pink: [1, 0.70, 0.78] };
 const SW = { yellow: "#FFE45C", orange: "#FFA04D", green: "#9EE39B", blue: "#9CCBFF", pink: "#FFB3C7" };
 let lastColor = "yellow", lastStyle = "hl";   // "hl" marcador · "ul" línea
@@ -1285,32 +1296,89 @@ async function tableEl(b) {
   const fig = document.createElement("figure"); fig.className = "blk fig table htmltable"; fig.dataset.b = b.id;
   const label = b.caption?.match(/^(table|tabla)\s*S?\d+[A-Za-z]?/i)?.[0] || "Tabla";
   const hidden = capHidden(b.id);
-  fig.innerHTML = `<div class="fighead"><span class="kindtag">${esc(label)}</span><span class="spacer"></span><button class="capbtn" aria-label="Mostrar u ocultar pie">${hidden ? "Mostrar pie" : "Ocultar pie"}</button>${b.img ? '<button class="zoombtn">Ampliar</button>' : ""}</div>
-    <div class="tablewrap">${sanitizeTable(b.html || "", b.id)}</div>
+  const m = tableModel(b.html || "", b.id);
+  fig.innerHTML = `<div class="fighead"><span class="kindtag">${esc(label)}</span><span class="spacer"></span>${m ? '<button class="viewbtn" aria-label="Cambiar vista de la tabla"></button>' : ""}<button class="capbtn" aria-label="Mostrar u ocultar pie">${hidden ? "Mostrar pie" : "Ocultar pie"}</button>${b.img ? '<button class="zoombtn">Ampliar</button>' : ""}</div>
+    <div class="tablewrap"></div>
     ${b.caption ? `<figcaption class="tx" data-b="${b.id}c" ${hidden ? "hidden" : ""}>${textHtml({ text: b.caption, spans: b.captionSpans || [] }, b.id + "c")}</figcaption>` : ""}
     ${b.note ? `<div class="tnote" ${hidden ? "hidden" : ""}>${esc(b.note)}</div>` : ""}`;
+  if (m) { renderTable(fig, b, m); $(".viewbtn", fig).addEventListener("click", () => { tableViewState.set(b.id, tableView(b.id, m) === "cards" ? "grid" : "cards"); renderTable(fig, b, m); }); }
   $(".zoombtn", fig)?.addEventListener("click", () => openFigure(b, 0));
   $(".capbtn", fig).addEventListener("click", () => toggleCap(fig, b.id));
   $(".fighead .kindtag", fig).addEventListener("click", () => toggleCap(fig, b.id));
   return fig;
 }
-function sanitizeTable(html, bid) {
-  const doc = new DOMParser().parseFromString(html, "text/html"); const t = doc.querySelector("table"); if (!t) return "";
-  t.querySelectorAll("*").forEach(el => { for (const at of [...el.attributes]) if (!/^(rowspan|colspan)$/i.test(at.name)) el.removeAttribute(at.name); });
-  t.querySelectorAll("script,style").forEach(x => x.remove());
-  const rows = [...t.querySelectorAll("tr")];
-  rows.forEach((tr, ri) => {
+// Modelo de la tabla preparada: celdas con id `${bid}.rXcY` (subrayables), filas de grupo, cabecera y anchos estimados.
+function tableModel(html, bid) {
+  const doc = new DOMParser().parseFromString(html, "text/html"); const t = doc.querySelector("table"); if (!t) return null;
+  const decode = h => h.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/[\u00ad]/g, "").replace(/[ \t\r\n]+/g, " ").trim();
+  // Los <br> del PDF son saltos de línea de maquetación; solo se conservan cuando parecen separar ítems distintos
+  // (la línea siguiente empieza por mayúscula y la anterior no termina en preposición/conjunción, coma o guion).
+  const NOBREAK = /\b(of|in|or|and|the|with|to|for|on|at|by|from|a|an|as|than|into|per|vs\.?)$|[,;:(\-–—/]$/i;
+  const cellText = td => {
+    // los <sup> (letras de nota al pie) se conservan como spans "sup"
+    const raw = td.innerHTML.replace(/<sup>([^<]*)<\/sup>/gi, "\u0001$1\u0002");
+    const parts = raw.split(/<br\s*\/?>/i).map(decode).filter(Boolean);
+    let out = "";
+    for (const part of parts) {
+      if (!out) { out = part; continue; }
+      const newItem = /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]/.test(part) || /^[A-Z][A-Za-z0-9-]*\s+[a-z]/.test(part);
+      const brk = /\.$/.test(out) ? /^[A-Z]/.test(part) : (newItem && !NOBREAK.test(out));
+      out += (brk ? "\n" : " ") + part;
+    }
+    const spans = []; let text = "";
+    for (const ch of out) { if (ch === "\u0001") spans.push({ k: "sup", s: text.length, e: text.length }); else if (ch === "\u0002") { if (spans.length) spans[spans.length - 1].e = text.length; } else text += ch; }
+    return { text, spans: spans.filter(x => x.e > x.s) };
+  };
+  const trs = [...t.querySelectorAll("tr")].filter(tr => [...tr.children].some(c => decode(c.innerHTML)));
+  const ncols = Math.max(...trs.map(tr => tr.children.length));
+  const longest = new Array(ncols).fill(0), longestLine = new Array(ncols).fill(0);
+  const rows = trs.map((tr, ri) => {
     const cells = [...tr.children];
-    // fila de grupo: solo la primera celda tiene texto → una celda ancha con estilo de subtítulo
-    if (cells.length > 1 && cells[0].textContent.trim() && cells.slice(1).every(c => !c.textContent.trim())) { cells.slice(1).forEach(c => c.remove()); cells[0].setAttribute("colspan", String(cells.length)); tr.classList.add("grp"); }
-    [...tr.children].forEach((td, ci) => {
-      const text = (td.innerHTML.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "")).replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/[\u00ad]/g, "").replace(/\s+/g, " ").trim();
-      const id = `${bid}.r${ri}c${ci}`;
-      if (!R.blockIndex.has(id)) R.blockIndex.set(id, { id, type: "cell", text, runs: [], spans: [], page: R.blockIndex.get(bid)?.page });
-      td.classList.add("tx"); td.dataset.b = id; td.innerHTML = textHtml({ text, spans: [] }, id);
+    const isHead = cells.every(c => c.tagName === "TH");
+    const grp = !isHead && cells.length > 1 && decode(cells[0].innerHTML) && cells.slice(1).every(c => !decode(c.innerHTML));
+    const out = cells.map((td, ci) => {
+      const { text, spans } = cellText(td); const id = `${bid}.r${ri}c${ci}`;
+      if (!R.blockIndex.has(id)) R.blockIndex.set(id, { id, type: "cell", text, runs: [], spans, page: R.blockIndex.get(bid)?.page });
+      if (!grp) { longest[ci] = Math.max(longest[ci], text.length); for (const ln of text.split("\n")) longestLine[ci] = Math.max(longestLine[ci], ln.length); }
+      return { id, text, spans, span: +td.getAttribute("colspan") || 1 };
     });
+    return { head: isHead, grp, cells: grp ? [out[0]] : out };
   });
-  return t.outerHTML;
+  // etiquetas de cabecera para las tarjetas (sin letras de nota al pie ni saltos)
+  const stripSup = c => { let t = ""; let i = 0; for (const sp of c.spans.filter(x => x.k === "sup").sort((a, b) => a.s - b.s)) { t += c.text.slice(i, sp.s); i = sp.e; } return (t + c.text.slice(i)).replace(/\n/g, " ").trim(); };
+  const header = rows[0]?.head ? rows[0].cells.map(stripSup) : null;
+  // Anchos por columna (cuadrícula): que cada línea del PDF quepa en una línea aquí (hasta 24em); columnas cortas, estrechas.
+  const widths = []; for (let ci = 0; ci < ncols; ci++) { const chars = Math.min(longestLine[ci], longest[ci]); widths.push(Math.max(4, Math.min(ci === 0 ? 12 : 24, chars * 0.52 + 1.2))); }
+  return { ncols, rows, header, widths, wide: widths.reduce((a, b) => a + b, 0) };
+}
+function tableGridHtml(m) {
+  let h = `<table><colgroup>${m.widths.map(w => `<col style="width:${w.toFixed(1)}em">`).join("")}</colgroup>`;
+  for (const r of m.rows) {
+    const tag = r.head ? "th" : "td";
+    if (r.grp) { h += `<tr class="grp"><td class="tx" data-b="${r.cells[0].id}" colspan="${m.ncols}"><span class="grpl">${textHtml(r.cells[0], r.cells[0].id)}</span></td></tr>`; continue; }
+    h += "<tr>" + r.cells.map(c => `<${tag} class="tx" data-b="${c.id}"${c.span > 1 ? ` colspan="${c.span}"` : ""}>${textHtml(c, c.id)}</${tag}>`).join("") + "</tr>";
+  }
+  return h + "</table>";
+}
+// Vista "tarjetas": una tarjeta por fila (primera celda como título, resto como etiqueta: valor); sin desplazamiento lateral.
+function tableCardsHtml(m) {
+  let h = `<div class="cards">`;
+  for (const r of m.rows) {
+    if (r.head) continue;
+    if (r.grp) { h += `<div class="cgrp tx" data-b="${r.cells[0].id}">${textHtml(r.cells[0], r.cells[0].id)}</div>`; continue; }
+    const [first, ...rest] = r.cells;
+    h += `<div class="card"><div class="ctitle tx" data-b="${first.id}">${textHtml(first, first.id)}</div>`;
+    rest.forEach((c, k) => { if (!c.text) return; const lab = m.header?.[k + 1]; h += `<div class="cf">${lab ? `<div class="cl">${esc(lab)}</div>` : ""}<div class="cv tx" data-b="${c.id}">${textHtml(c, c.id)}</div></div>`; });
+    h += "</div>";
+  }
+  return h + "</div>";
+}
+const tableViewState = new Map();
+function tableView(bid, m) { if (tableViewState.has(bid)) return tableViewState.get(bid); return (m.ncols >= 4 || m.wide > 40) ? "cards" : "grid"; }
+function renderTable(fig, b, m) {
+  const view = tableView(b.id, m); fig.dataset.view = view;
+  $(".tablewrap", fig).innerHTML = view === "cards" ? tableCardsHtml(m) : tableGridHtml(m);
+  const bt = $(".viewbtn", fig); if (bt) bt.textContent = view === "cards" ? "Cuadrícula" : "Tarjetas";
 }
 const capState = new Map();
 function capHidden(bid) { if (capState.has(bid)) return capState.get(bid); return !!prefs.hideCaps; }
@@ -1369,7 +1437,7 @@ function addBlockNotes(wrap, bid) {
 }
 const baseId = id => id.replace(/\.r\d+c\d+$/, "").replace(/c$/, (m, off, str) => (["fig", "table"].includes(R.blockIndex.get(str.slice(0, -1))?.type) ? "" : m));
 function rerenderBlock(bid) {
-  if (/\.r\d+c\d+$/.test(bid)) { const td = art.querySelector(`[data-b="${bid}"]`); const b = R.blockIndex.get(bid); if (td && b) td.innerHTML = textHtml({ text: b.text, spans: [] }, bid); return; }
+  if (/\.r\d+c\d+$/.test(bid)) { const td = art.querySelector(`[data-b="${bid}"]`); const b = R.blockIndex.get(bid); if (td && b) ($(".grpl", td) || td).innerHTML = textHtml(b, bid); return; }
   const base = baseId(bid);
   const el = art.querySelector(`[data-b="${base}"]`); if (!el) return;
   if (base !== bid) { const cap = $("figcaption", el); const b = R.blockIndex.get(base); if (cap) cap.innerHTML = textHtml({ text: b.caption, spans: b.captionSpans || [] }, bid); return; }
@@ -1579,7 +1647,7 @@ function openGallery(items, start = 0, fullItem = null) {
   const show = () => {
     const it = cur(); stage.querySelectorAll("img,canvas").forEach(x => x.remove());
     el = it.canvas || Object.assign(new Image(), { src: it.src }); el.draggable = false; stage.appendChild(el);
-    pz = panZoom(stage, el, { onSwipe: d => { if (showingFull) return; if (d < 0 && i < items.length - 1) { i++; show(); } else if (d > 0 && i > 0) { i--; show(); } } });
+    pz.el = el;
     $(".t", v).textContent = it.title || "";
     cap.hidden = !it.caption || !capOn; cap.innerHTML = it.caption || ""; cap.scrollTop = 0;
     nav.hidden = showingFull || items.length < 2; prev.disabled = i === 0; next.disabled = i === items.length - 1; pos.textContent = it.sub || `${i + 1}/${items.length}`;
@@ -1592,21 +1660,24 @@ function openGallery(items, start = 0, fullItem = null) {
   fullBtn?.addEventListener("click", () => { showingFull = !showingFull; show(); });
   let capOn = !prefs.hideCaps; const flipCap = () => { capOn = !capOn; cap.hidden = !capOn || !cur().caption; $(".capv", v).classList.toggle("off", !capOn); };
   $(".capv", v).addEventListener("click", flipCap);
+  // Toque simple sobre la imagen ampliada → mostrar/ocultar el pie. En iOS el touchstart con preventDefault (zoom/arrastre)
+  // anula el click sintético, así que el toque llega por onTap desde panZoom; el click queda para ratón.
+  pz = panZoom(stage, null, { onTap: flipCap, onSwipe: d => { if (showingFull) return; if (d < 0 && i < items.length - 1) { i++; show(); } else if (d > 0 && i > 0) { i--; show(); } } });
   stage.addEventListener("click", e => { if (e.target.closest("img,canvas")) flipCap(); });
   const onResize = () => fit(); window.addEventListener("resize", onResize);
   const obs = new MutationObserver(() => { if (!document.body.contains(v)) { window.removeEventListener("resize", onResize); obs.disconnect(); } }); obs.observe(document.body, { childList: true });
   show();
 }
 function panZoom(stage, el, opts = {}) {
-  const st = { s: 1, x: 0, y: 0, min: 0.2 };
-  const apply = () => { el.style.transform = `translate(${st.x}px,${st.y}px) scale(${st.s})`; };
+  const st = { s: 1, x: 0, y: 0, min: 0.2, el, onTap: opts.onTap };
+  const apply = () => { if (st.el) st.el.style.transform = `translate(${st.x}px,${st.y}px) scale(${st.s})`; };
   st.set = (s, x, y) => { st.s = s; st.x = x; st.y = y; apply(); };
-  let t0 = null, lastTap = 0;
+  let t0 = null, lastTap = 0, tapTimer = null;
   stage.addEventListener("touchstart", e => { e.preventDefault(); t0 = snap(e); }, { passive: false });
   stage.addEventListener("touchmove", e => {
     e.preventDefault(); if (!t0) return; const t = snap(e);
     if (t.n === 2 && t0.n === 2) { const k = t.d / t0.d; const ns = Math.max(st.min * 0.8, Math.min(8, t0.s * k)); st.x = t.cx - (t0.cx - t0.x) * ns / t0.s; st.y = t.cy - (t0.cy - t0.y) * ns / t0.s; st.s = ns; }
-    else if (!opts.onSwipe || st.s > st.min * 1.02 || (el.height || el.naturalHeight) * st.s > stage.clientHeight) { st.x = t0.x + (t.cx - t0.cx); st.y = t0.y + (t.cy - t0.cy); }
+    else if (!opts.onSwipe || st.s > st.min * 1.02 || ((st.el?.height || st.el?.naturalHeight || 0) * st.s > stage.clientHeight)) { st.x = t0.x + (t.cx - t0.cx); st.y = t0.y + (t.cy - t0.cy); }
     apply();
   }, { passive: false });
   stage.addEventListener("touchend", e => {
@@ -1614,7 +1685,10 @@ function panZoom(stage, el, opts = {}) {
       const t = e.changedTouches[0]; const now = Date.now();
       const r0 = stage.getBoundingClientRect(); const dx = (t.clientX - r0.left) - t0.cx, dy = (t.clientY - r0.top) - t0.cy;
       if (opts.onSwipe && st.s <= st.min * 1.02 && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { opts.onSwipe(dx); t0 = null; return; }
-      if (now - lastTap < 300 && Math.hypot(t.clientX - t0.cx, t.clientY - t0.cy) < 20) { const r = stage.getBoundingClientRect(); const px = t.clientX - r.left, py = t.clientY - r.top; const ns = st.s > st.min * 1.5 ? st.min : st.min * 2.5; st.x = px - (px - st.x) * ns / st.s; st.y = py - (py - st.y) * ns / st.s; st.s = ns; apply(); }
+      const moved = Math.hypot(dx, dy) > 12;
+      if (now - lastTap < 300 && !moved) { clearTimeout(tapTimer); tapTimer = null; const r = stage.getBoundingClientRect(); const px = t.clientX - r.left, py = t.clientY - r.top; const ns = st.s > st.min * 1.5 ? st.min : st.min * 2.5; st.x = px - (px - st.x) * ns / st.s; st.y = py - (py - st.y) * ns / st.s; st.s = ns; apply(); lastTap = 0; t0 = null; return; }
+      // toque simple: esperar por si es doble toque (zoom); si no, avisar (p. ej. mostrar/ocultar el pie)
+      if (!moved && st.onTap) { clearTimeout(tapTimer); tapTimer = setTimeout(() => { tapTimer = null; st.onTap(); }, 300); }
       lastTap = now;
     }
     t0 = e.touches.length ? snap(e) : null;
