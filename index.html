@@ -232,8 +232,8 @@ article ::selection{background:rgba(31,111,99,.3);}
   <!-- ===== Biblioteca ===== -->
   <section id="library" class="screen">
     <header class="topbar">
-      <h1>Lector</h1>
-      <button id="importBtn" class="primary">Importar PDF</button>
+      <h1>Lector <small id="ver" style="font-size:11px;font-weight:500;color:var(--muted);vertical-align:middle"></small></h1>
+      <button id="importBtn" class="primary">Importar</button>
       <input type="file" id="fileInput" accept="application/pdf,application/json,.pdf,.json,.lector" multiple hidden>
     </header>
     <div id="chips" class="chips"></div>
@@ -863,6 +863,7 @@ function classify(blocks, body, pages) {
    ===================================================================== */
 const $ = (s, el = document) => el.querySelector(s);
 const AUTHOR = "Rodri";
+const APP_VERSION = "3.1";
 const COLORS = { yellow: [1, 0.89, 0.36], orange: [1, 0.62, 0.30], green: [0.62, 0.89, 0.61], blue: [0.61, 0.80, 1], pink: [1, 0.70, 0.78] };
 const SW = { yellow: "#FFE45C", orange: "#FFA04D", green: "#9EE39B", blue: "#9CCBFF", pink: "#FFB3C7" };
 let lastColor = "yellow", lastStyle = "hl";   // "hl" marcador · "ul" línea
@@ -1737,11 +1738,16 @@ async function exportPdf(d) {
 
 /* ---------- Arranque ---------- */
 applyPrefs();
+$("#ver").textContent = "v" + APP_VERSION;
 renderLibrary();
 window.lector = { DB, R, openDoc, importFiles, rangeToAnnots, buildAnnotatedPdf, toMarkdown, analyzePdf, prefs, findPanelsInImage, pdfjsLib };
 </script>
 <script>
-if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{})); }
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").then(reg => { try { reg.update(); } catch (e) {} }).catch(() => {}));
+  // cuando se instala una versión nueva, recargar una vez para usarla
+  let reloaded = false; navigator.serviceWorker.addEventListener("controllerchange", () => { if (!reloaded) { reloaded = true; location.reload(); } });
+}
 </script>
 </body>
 </html>
