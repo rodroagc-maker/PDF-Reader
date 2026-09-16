@@ -1,5 +1,5 @@
 // Cache del "cascarón" de la app para que funcione sin conexión (los PDFs viven en IndexedDB).
-const CACHE = "lector-v7";
+const CACHE = "lector-v9";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.png",
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs",
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs",

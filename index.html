@@ -132,11 +132,12 @@ figure .panelstrip button{flex:none;width:64px;height:64px;border-radius:8px;bor
 figure .panelstrip button b{position:absolute;left:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:1px 6px;border-radius:0 6px 0 0;font-family:var(--sans);}
 /* tablas HTML */
 .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:8px;background:var(--surface);}
-.tablewrap table{border-collapse:collapse;font-family:var(--sans);font-size:.78em;line-height:1.35;min-width:100%;}
-.tablewrap th,.tablewrap td{padding:6px 9px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left;min-width:7em;}
-.tablewrap th{font-weight:700;background:var(--bg);position:sticky;top:0;}
-.tablewrap tr:nth-child(even) td{background:color-mix(in srgb,var(--bg) 60%,transparent);}
-.tablewrap td:first-child,.tablewrap th:first-child{position:sticky;left:0;background:var(--surface);font-weight:600;box-shadow:1px 0 0 var(--line);}
+.tablewrap table{border-collapse:separate;border-spacing:0;font-family:var(--sans);font-size:.78em;line-height:1.35;width:max-content;min-width:100%;table-layout:auto;}
+.tablewrap th,.tablewrap td{padding:6px 9px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top;text-align:left;min-width:0;max-width:15em;background:var(--surface);}
+.tablewrap th{font-weight:700;background:var(--bg);max-width:7em;}
+.tablewrap tr.grp td{background:var(--bg);font-weight:700;color:var(--accent);}
+.tablewrap td:first-child,.tablewrap th:first-child{position:sticky;left:0;z-index:1;font-weight:600;max-width:11em;border-right:2px solid var(--line);}
+.tablewrap .hl{border-radius:2px;}
 .pagemark{text-align:right;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:1.4em 0 .4em;font-family:var(--sans);font-variant-numeric:tabular-nums;}
 .hl{border-radius:2px;padding:1px 0;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
 .hl.yellow{background:var(--hl-yellow);} .hl.orange{background:var(--hl-orange);} .hl.green{background:var(--hl-green);} .hl.blue{background:var(--hl-blue);} .hl.pink{background:var(--hl-pink);}
@@ -1273,7 +1274,7 @@ async function figureEl(b) {
     ${strip}
     ${b.caption ? `<figcaption class="tx" data-b="${b.id}c" ${hidden ? "hidden" : ""}>${textHtml({ text: b.caption, spans: b.captionSpans || [] }, b.id + "c")}</figcaption>` : ""}`;
   const open = () => src ? openFigure(b, 0) : openPageViewer(b.page);
-  $(".wrap", fig).addEventListener("click", open); $(".zoombtn", fig).addEventListener("click", open);
+  $(".wrap", fig).addEventListener("click", () => toggleCap(fig, b.id)); $(".zoombtn", fig).addEventListener("click", open);
   $(".capbtn", fig).addEventListener("click", () => toggleCap(fig, b.id));
   fig.querySelectorAll(".panelstrip button").forEach(bt => bt.addEventListener("click", () => openFigure(b, +bt.dataset.i)));
   return fig;
@@ -1284,17 +1285,30 @@ async function tableEl(b) {
   const label = b.caption?.match(/^(table|tabla)\s*S?\d+[A-Za-z]?/i)?.[0] || "Tabla";
   const hidden = capHidden(b.id);
   fig.innerHTML = `<div class="fighead"><span class="kindtag">${esc(label)}</span><span class="spacer"></span><button class="capbtn" aria-label="Mostrar u ocultar pie">${hidden ? "Mostrar pie" : "Ocultar pie"}</button>${b.img ? '<button class="zoombtn">Ampliar</button>' : ""}</div>
-    <div class="tablewrap">${sanitizeTable(b.html || "")}</div>
+    <div class="tablewrap">${sanitizeTable(b.html || "", b.id)}</div>
     ${b.caption ? `<figcaption class="tx" data-b="${b.id}c" ${hidden ? "hidden" : ""}>${textHtml({ text: b.caption, spans: b.captionSpans || [] }, b.id + "c")}</figcaption>` : ""}
     ${b.note ? `<div class="tnote" ${hidden ? "hidden" : ""}>${esc(b.note)}</div>` : ""}`;
   $(".zoombtn", fig)?.addEventListener("click", () => openFigure(b, 0));
   $(".capbtn", fig).addEventListener("click", () => toggleCap(fig, b.id));
+  $(".fighead .kindtag", fig).addEventListener("click", () => toggleCap(fig, b.id));
   return fig;
 }
-function sanitizeTable(html) {
+function sanitizeTable(html, bid) {
   const doc = new DOMParser().parseFromString(html, "text/html"); const t = doc.querySelector("table"); if (!t) return "";
   t.querySelectorAll("*").forEach(el => { for (const at of [...el.attributes]) if (!/^(rowspan|colspan)$/i.test(at.name)) el.removeAttribute(at.name); });
   t.querySelectorAll("script,style").forEach(x => x.remove());
+  const rows = [...t.querySelectorAll("tr")];
+  rows.forEach((tr, ri) => {
+    const cells = [...tr.children];
+    // fila de grupo: solo la primera celda tiene texto → una celda ancha con estilo de subtítulo
+    if (cells.length > 1 && cells[0].textContent.trim() && cells.slice(1).every(c => !c.textContent.trim())) { cells.slice(1).forEach(c => c.remove()); cells[0].setAttribute("colspan", String(cells.length)); tr.classList.add("grp"); }
+    [...tr.children].forEach((td, ci) => {
+      const text = (td.innerHTML.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "")).replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/[\u00ad]/g, "").replace(/\s+/g, " ").trim();
+      const id = `${bid}.r${ri}c${ci}`;
+      if (!R.blockIndex.has(id)) R.blockIndex.set(id, { id, type: "cell", text, runs: [], spans: [], page: R.blockIndex.get(bid)?.page });
+      td.classList.add("tx"); td.dataset.b = id; td.innerHTML = textHtml({ text, spans: [] }, id);
+    });
+  });
   return t.outerHTML;
 }
 const capState = new Map();
@@ -1352,8 +1366,10 @@ function addBlockNotes(wrap, bid) {
   const notes = R.doc.annots.filter(a => a.block === bid && a.e === a.s);
   notes.forEach((a, i) => { const c = document.createElement("button"); c.className = "bnote"; c.dataset.id = a.id; c.textContent = "✎"; c.style.top = (-8 + 30 * i) + "px"; c.setAttribute("aria-label", "Nota"); wrap.appendChild(c); });
 }
+const baseId = id => id.replace(/\.r\d+c\d+$/, "").replace(/c$/, (m, off, str) => (["fig", "table"].includes(R.blockIndex.get(str.slice(0, -1))?.type) ? "" : m));
 function rerenderBlock(bid) {
-  const base = bid.endsWith("c") && ["fig", "table"].includes(R.blockIndex.get(bid.slice(0, -1))?.type) ? bid.slice(0, -1) : bid;
+  if (/\.r\d+c\d+$/.test(bid)) { const td = art.querySelector(`[data-b="${bid}"]`); const b = R.blockIndex.get(bid); if (td && b) td.innerHTML = textHtml({ text: b.text, spans: [] }, bid); return; }
+  const base = baseId(bid);
   const el = art.querySelector(`[data-b="${base}"]`); if (!el) return;
   if (base !== bid) { const cap = $("figcaption", el); const b = R.blockIndex.get(base); if (cap) cap.innerHTML = textHtml({ text: b.caption, spans: b.captionSpans || [] }, bid); return; }
   if (R.blockIndex.get(bid)?.type === "table" || R.blockIndex.get(bid)?.type === "fig") return;
@@ -1381,7 +1397,7 @@ function updatePage() {
 }
 function saveDocSoon() { clearTimeout(R.saveT); R.saveT = setTimeout(() => R.doc && DB.putMeta(R.doc), 500); }
 function scrollToBlock(bid, flashId) {
-  const base = R.blockIndex.get(bid)?.type === "caption" && bid.endsWith("c") ? bid.slice(0, -1) : bid;
+  const base = baseId(bid);
   const el = art.querySelector(`[data-b="${base}"]`); if (!el) return;
   scrollEl.scrollTo({ top: el.offsetTop - 60, behavior: "smooth" });
   if (flashId) setTimeout(() => { art.querySelectorAll(`.hl[data-id="${flashId}"]`).forEach(h => { h.classList.add("flash"); setTimeout(() => h.classList.remove("flash"), 1500); }); }, 500);
@@ -1480,7 +1496,7 @@ function annotSheet(a, focusNote = false) {
 /* Lista de subrayados y notas */
 $("#notesBtn").addEventListener("click", () => {
   const order = new Map(R.reflow.blocks.map((b, i) => [b.id, i]));
-  const idx = a => (order.get(a.block.replace(/c$/, "")) ?? 0) * 1e6 + a.s;
+  const idx = a => (order.get(baseId(a.block)) ?? 0) * 1e6 + a.s;
   const list = [...R.doc.annots].sort((x, y) => idx(x) - idx(y));
   if (!list.length) { toast("Aún no hay subrayados. Mantén pulsado sobre el texto para seleccionar."); return; }
   let html = `<h2>${list.filter(a => a.e > a.s).length} subrayados · ${list.filter(a => a.note).length} notas</h2><div class="notes">`; let lastP = 0;
@@ -1573,7 +1589,9 @@ function openGallery(items, start = 0, fullItem = null) {
   prev.addEventListener("click", () => { if (i > 0) { i--; show(); } });
   next.addEventListener("click", () => { if (i < items.length - 1) { i++; show(); } });
   fullBtn?.addEventListener("click", () => { showingFull = !showingFull; show(); });
-  let capOn = !prefs.hideCaps; $(".capv", v).addEventListener("click", () => { capOn = !capOn; cap.hidden = !capOn || !cur().caption; $(".capv", v).classList.toggle("off", !capOn); });
+  let capOn = !prefs.hideCaps; const flipCap = () => { capOn = !capOn; cap.hidden = !capOn || !cur().caption; $(".capv", v).classList.toggle("off", !capOn); };
+  $(".capv", v).addEventListener("click", flipCap);
+  stage.addEventListener("click", e => { if (e.target.closest("img,canvas")) flipCap(); });
   const onResize = () => fit(); window.addEventListener("resize", onResize);
   const obs = new MutationObserver(() => { if (!document.body.contains(v)) { window.removeEventListener("resize", onResize); obs.disconnect(); } }); obs.observe(document.body, { childList: true });
   show();
@@ -1634,13 +1652,14 @@ async function shareFile(bytes, name, type) {
 function toMarkdown(d, reflow) {
   const order = new Map(reflow.blocks.map((b, i) => [b.id, i]));
   const byId = new Map(reflow.blocks.map(b => [b.id, b]));
-  const heading = bid => { let i = order.get(bid.replace(/c$/, "")) ?? 0; for (; i >= 0; i--) { const b = reflow.blocks[i]; if (/^h[123]$/.test(b.type)) return b.text; } return null; };
-  const list = [...d.annots].sort((x, y) => ((order.get(x.block.replace(/c$/, "")) ?? 0) * 1e6 + x.s) - ((order.get(y.block.replace(/c$/, "")) ?? 0) * 1e6 + y.s));
+  const bid0 = id => id.replace(/\.r\d+c\d+$/, "").replace(/c$/, "");
+  const heading = bid => { let i = order.get(bid0(bid)) ?? 0; for (; i >= 0; i--) { const b = reflow.blocks[i]; if (/^h[123]$/.test(b.type)) return b.text; } return null; };
+  const list = [...d.annots].sort((x, y) => ((order.get(bid0(x.block)) ?? 0) * 1e6 + x.s) - ((order.get(bid0(y.block)) ?? 0) * 1e6 + y.s));
   const nH = list.filter(a => a.e > a.s).length, nN = list.filter(a => a.note).length;
   let md = `# ${d.name}\n\n_Exportado el ${fmtDate(Date.now())} · ${nH} subrayados · ${nN} notas_\n`;
   let lastH = undefined;
   for (const a of list) {
-    const h = heading(a.block); const p = byId.get(a.block.replace(/c$/, ""))?.page;
+    const h = heading(a.block); const p = byId.get(bid0(a.block))?.page;
     if (h !== lastH) { md += `\n## ${h || "Inicio"}\n\n`; lastH = h; }
     if (a.e > a.s) { md += `- ==${a.text}== _(p. ${p})_\n`; if (a.note) md += `  > ${a.note.replace(/\n/g, "\n  > ")}\n`; }
     else md += `- **Nota** _(p. ${p})_: ${a.note.replace(/\n/g, " ")}\n`;
