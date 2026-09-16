@@ -233,7 +233,7 @@ article ::selection{background:rgba(31,111,99,.3);}
     <header class="topbar">
       <h1>Lector</h1>
       <button id="importBtn" class="primary">Importar PDF</button>
-      <input type="file" id="fileInput" accept="application/pdf,.pdf,.lector,application/json" multiple hidden>
+      <input type="file" id="fileInput" accept="application/pdf,application/json,.pdf,.json,.lector" multiple hidden>
     </header>
     <div id="chips" class="chips"></div>
     <div id="docList" class="doclist"></div>
@@ -1037,7 +1037,7 @@ async function importFiles(files) {
   for (const f of files) {
     try {
       progress(0, `Abriendo ${f.name}…`);
-      if (/\.(lector|json)$/i.test(f.name)) { await importPackage(f); continue; }
+      if (/\.(lector|json)$/i.test(f.name) || f.type === "application/json") { await importPackage(f); continue; }
       const buf = await f.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
       const id = uid();
@@ -1080,7 +1080,7 @@ async function importPackage(f) {
   progress(0.7, "Leyendo subrayados previos…");
   let annots = [];
   try { const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise; annots = await importExistingAnnots(pdf, reflow); pdf.destroy(); } catch (e) { console.warn(e); }
-  const meta = { id, name: pkg.name || f.name.replace(/\.lector$/i, ""), file: pkg.file || f.name, pages: pkg.pages || reflow.pages, size: buf.byteLength, added: Date.now(), opened: 0, pos: null, annots, status: "unread", lists: [], prepared: true };
+  const meta = { id, name: pkg.name || f.name.replace(/(\.lector)?\.(json|lector)$/i, ""), file: pkg.file || f.name, pages: pkg.pages || reflow.pages, size: buf.byteLength, added: Date.now(), opened: 0, pos: null, annots, status: "unread", lists: [], prepared: true };
   await DB.putFile(id, buf); await DB.putReflow(id, reflow);
   for (const [k, blob] of images) await DB.putImage(k, blob);
   await DB.putMeta(meta);
