@@ -863,7 +863,7 @@ function classify(blocks, body, pages) {
    ===================================================================== */
 const $ = (s, el = document) => el.querySelector(s);
 const AUTHOR = "Rodri";
-const APP_VERSION = "3.1";
+const APP_VERSION = "3.2";
 const COLORS = { yellow: [1, 0.89, 0.36], orange: [1, 0.62, 0.30], green: [0.62, 0.89, 0.61], blue: [0.61, 0.80, 1], pink: [1, 0.70, 0.78] };
 const SW = { yellow: "#FFE45C", orange: "#FFA04D", green: "#9EE39B", blue: "#9CCBFF", pink: "#FFB3C7" };
 let lastColor = "yellow", lastStyle = "hl";   // "hl" marcador · "ul" línea
@@ -1275,7 +1275,7 @@ async function figureEl(b) {
     ${strip}
     ${b.caption ? `<figcaption class="tx" data-b="${b.id}c" ${hidden ? "hidden" : ""}>${textHtml({ text: b.caption, spans: b.captionSpans || [] }, b.id + "c")}</figcaption>` : ""}`;
   const open = () => src ? openFigure(b, 0) : openPageViewer(b.page);
-  $(".wrap", fig).addEventListener("click", () => toggleCap(fig, b.id)); $(".zoombtn", fig).addEventListener("click", open);
+  $(".wrap", fig).addEventListener("click", open); $(".zoombtn", fig).addEventListener("click", open);   // toque en la imagen → ampliar; en la galería, toque → pie
   $(".capbtn", fig).addEventListener("click", () => toggleCap(fig, b.id));
   fig.querySelectorAll(".panelstrip button").forEach(bt => bt.addEventListener("click", () => openFigure(b, +bt.dataset.i)));
   return fig;
