@@ -18,7 +18,7 @@
   --accent:#1F6F63; --accent-ink:#FFFFFF; --danger:#B4423A;
   --bar:rgba(246,245,241,.94); --paper:#FBFAF7;
   --hl-yellow:rgba(255,228,92,.75); --hl-green:rgba(158,227,155,.7); --hl-blue:rgba(156,203,255,.7); --hl-pink:rgba(255,179,199,.7);
-  --sw-yellow:#FFE45C; --sw-green:#9EE39B; --sw-blue:#9CCBFF; --sw-pink:#FFB3C7;
+  --sw-yellow:#FFE45C; --sw-orange:#FFA04D; --sw-green:#9EE39B; --sw-blue:#9CCBFF; --sw-pink:#FFB3C7; --hl-orange:rgba(255,160,77,.6);
   --fs:18px; --lh:1.55;
   color-scheme:light;
 }
@@ -26,14 +26,14 @@
   :root:not([data-theme="light"]){
     --bg:#141517; --surface:#1E2023; --ink:#E6E3DC; --muted:#9A968D; --line:#2C2F34;
     --accent:#5FBFAF; --accent-ink:#0F1A18; --danger:#E0736A; --bar:rgba(20,21,23,.94); --paper:#17181B;
-    --hl-yellow:rgba(255,214,60,.42); --hl-green:rgba(120,210,120,.4); --hl-blue:rgba(110,170,255,.42); --hl-pink:rgba(255,140,170,.42);
+    --hl-yellow:rgba(255,214,60,.42); --hl-orange:rgba(255,150,60,.45); --hl-green:rgba(120,210,120,.4); --hl-blue:rgba(110,170,255,.42); --hl-pink:rgba(255,140,170,.42);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#141517; --surface:#1E2023; --ink:#E6E3DC; --muted:#9A968D; --line:#2C2F34;
   --accent:#5FBFAF; --accent-ink:#0F1A18; --danger:#E0736A; --bar:rgba(20,21,23,.94); --paper:#17181B;
-  --hl-yellow:rgba(255,214,60,.42); --hl-green:rgba(120,210,120,.4); --hl-blue:rgba(110,170,255,.42); --hl-pink:rgba(255,140,170,.42);
+  --hl-yellow:rgba(255,214,60,.42); --hl-orange:rgba(255,150,60,.45); --hl-green:rgba(120,210,120,.4); --hl-blue:rgba(110,170,255,.42); --hl-pink:rgba(255,140,170,.42);
   color-scheme:dark;
 }
 
@@ -89,40 +89,62 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .progress .bar{height:4px;border-radius:2px;background:var(--line);margin-top:8px;overflow:hidden;}
 .progress .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s;}
 
-/* ---------- Reader (texto reflujo) ---------- */
+/* ---------- Reader (texto reflujo) ----------
+   Sistema visual: el cuerpo en serif; encabezados, pies, notas y tablas en sans, con etiqueta de tipo,
+   para que cada clase de bloque se reconozca de un vistazo. */
 #scroll{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--paper);overscroll-behavior:contain;position:relative;}
 article{max-width:42em;margin:0 auto;padding:18px 18px 40vh;font-size:var(--fs);line-height:var(--lh);
-  font-family:Georgia,"Times New Roman","Iowan Old Style",serif;-webkit-user-select:text;user-select:text;}
-article.sans{font-family:-apple-system,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;}
-.blk{position:relative;margin:0 0 .85em;}
+  font-family:Georgia,"Times New Roman","Iowan Old Style",serif;-webkit-user-select:text;user-select:text;--sans:-apple-system,"SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;}
+article.sans{font-family:var(--sans);}
+.blk{position:relative;margin:0 0 1.1em;}
 .blk .tx{margin:0;text-wrap:pretty;overflow-wrap:break-word;}
-.blk.title .tx{font-size:1.45em;line-height:1.25;font-weight:700;margin:.2em 0 .6em;text-wrap:balance;}
-.blk.h1 .tx{font-size:1.28em;line-height:1.3;font-weight:700;margin:1.3em 0 .5em;}
-.blk.h2 .tx{font-size:1.15em;line-height:1.3;font-weight:700;margin:1.2em 0 .45em;}
-.blk.h3 .tx{font-size:1em;font-weight:700;margin:1em 0 .35em;}
-.blk.caption .tx,.blk.footnote .tx{font-size:.84em;color:var(--muted);line-height:1.45;}
-.blk.footnote{margin-top:1.2em;border-left:2px solid var(--line);padding-left:10px;}
-.blk.ref .tx{font-size:.84em;line-height:1.45;color:var(--muted);margin-bottom:.5em;}
-.refs summary{cursor:pointer;font-weight:700;margin:1.4em 0 .6em;font-size:1.05em;}
+.blk.title .tx{font-family:var(--sans);font-size:1.5em;line-height:1.22;font-weight:800;letter-spacing:-.01em;margin:.2em 0 .7em;text-wrap:balance;}
+.blk.h1 .tx{font-family:var(--sans);font-size:1.3em;line-height:1.25;font-weight:800;margin:1.6em 0 .5em;letter-spacing:-.01em;}
+.blk.h2 .tx{font-family:var(--sans);font-size:1.16em;line-height:1.3;font-weight:750;margin:1.5em 0 .45em;}
+.blk.h3 .tx{font-family:var(--sans);font-size:.98em;font-weight:700;margin:1.2em 0 .35em;color:var(--accent);text-transform:none;}
+.blk.h1::before,.blk.h2::before{content:"";display:block;width:34px;height:3px;background:var(--accent);border-radius:2px;margin-top:1.2em;}
+.blk.h1 .tx,.blk.h2 .tx{margin-top:.5em;}
+.blk.li .tx{padding-left:1.1em;text-indent:-1.1em;}
+.blk.li .tx::before{content:"•";color:var(--accent);display:inline-block;width:1.1em;text-indent:0;}
+.blk.p+.blk.li,.blk.li+.blk.li{margin-top:-.5em;}
+.blk.footnote{margin:1.4em 0;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 12px;font-family:var(--sans);}
+.blk.footnote .tx{font-size:.8em;color:var(--muted);line-height:1.45;margin:0;}
+.blk.ref .tx{font-family:var(--sans);font-size:.82em;line-height:1.45;color:var(--muted);margin-bottom:.55em;}
+.refs summary{cursor:pointer;font-weight:700;margin:1.6em 0 .6em;font-size:1.05em;font-family:var(--sans);}
 .refs summary::-webkit-details-marker{color:var(--muted);}
-figure{margin:1.2em 0;}
+.kindtag{display:inline-block;font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:6px;padding:3px 8px;}
+.blk.footnote .kindtag{margin-bottom:6px;}
+/* figuras y tablas: tarjeta con cabecera */
+figure{margin:1.6em 0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 10px 12px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+figure .fighead{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:var(--sans);}
+figure .fighead .spacer{flex:1;}
+figure .capbtn,figure .zoombtn{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 10px;background:var(--bg);}
+figure .zoombtn{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);}
+figure .wrap{position:relative;}
 figure .fig{display:block;width:100%;height:auto;border-radius:8px;background:#fff;border:1px solid var(--line);}
 figure .fig.nomatch{padding:24px;box-sizing:border-box;text-align:center;color:var(--muted);font-size:.9em;}
-figcaption{font-size:.84em;color:var(--muted);line-height:1.45;margin-top:.5em;}
-figure.table .fig{max-height:38vh;object-fit:cover;object-position:top left;}
-figure .kind{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:4px 8px;font-size:12px;font-family:-apple-system,system-ui,sans-serif;}
-figure .panelstrip{display:flex;gap:6px;margin-top:6px;overflow-x:auto;scrollbar-width:none;}
+figure.table:not(.htmltable) .fig{max-height:38vh;object-fit:cover;object-position:top left;}
+figcaption{font-family:var(--sans);font-size:.84em;color:var(--ink);line-height:1.45;margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);}
+figure .tnote{font-family:var(--sans);font-size:.76em;color:var(--muted);line-height:1.4;margin-top:6px;}
+figure .panelstrip{display:flex;gap:6px;margin-top:8px;overflow-x:auto;scrollbar-width:none;}
 figure .panelstrip::-webkit-scrollbar{display:none;}
 figure .panelstrip button{flex:none;width:64px;height:64px;border-radius:8px;border:1px solid var(--line);background:#fff center/cover no-repeat;position:relative;overflow:hidden;}
-figure .panelstrip button b{position:absolute;left:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:1px 6px;border-radius:0 6px 0 0;font-family:-apple-system,system-ui,sans-serif;}
-figure .zoomhint{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:4px 8px;font-size:12px;font-family:-apple-system,system-ui,sans-serif;}
-figure .wrap{position:relative;}
-.pagemark{text-align:right;font-size:11.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:1.6em 0 .6em;font-family:-apple-system,system-ui,sans-serif;font-variant-numeric:tabular-nums;border-top:1px dashed var(--line);padding-top:4px;}
+figure .panelstrip button b{position:absolute;left:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:1px 6px;border-radius:0 6px 0 0;font-family:var(--sans);}
+/* tablas HTML */
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:8px;background:var(--surface);}
+.tablewrap table{border-collapse:collapse;font-family:var(--sans);font-size:.78em;line-height:1.35;min-width:100%;}
+.tablewrap th,.tablewrap td{padding:6px 9px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left;min-width:7em;}
+.tablewrap th{font-weight:700;background:var(--bg);position:sticky;top:0;}
+.tablewrap tr:nth-child(even) td{background:color-mix(in srgb,var(--bg) 60%,transparent);}
+.tablewrap td:first-child,.tablewrap th:first-child{position:sticky;left:0;background:var(--surface);font-weight:600;box-shadow:1px 0 0 var(--line);}
+.pagemark{text-align:right;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:1.4em 0 .4em;font-family:var(--sans);font-variant-numeric:tabular-nums;}
 .hl{border-radius:2px;padding:1px 0;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
-.hl.yellow{background:var(--hl-yellow);} .hl.green{background:var(--hl-green);} .hl.blue{background:var(--hl-blue);} .hl.pink{background:var(--hl-pink);}
-.hl.noted::after{content:"✎";font-size:.7em;color:var(--accent);margin-left:2px;vertical-align:super;font-family:-apple-system,system-ui,sans-serif;}
+.hl.yellow{background:var(--hl-yellow);} .hl.orange{background:var(--hl-orange);} .hl.green{background:var(--hl-green);} .hl.blue{background:var(--hl-blue);} .hl.pink{background:var(--hl-pink);}
+.hl.ul{background:none!important;text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:3px;text-decoration-skip-ink:none;}
+.hl.ul.yellow{text-decoration-color:var(--sw-yellow);} .hl.ul.orange{text-decoration-color:var(--sw-orange);} .hl.ul.green{text-decoration-color:var(--sw-green);} .hl.ul.blue{text-decoration-color:var(--sw-blue);} .hl.ul.pink{text-decoration-color:var(--sw-pink);}
+.hl.noted::after{content:"✎";font-size:.7em;color:var(--accent);margin-left:2px;vertical-align:super;font-family:var(--sans);}
 .hl.flash{outline:2px solid var(--accent);outline-offset:2px;}
-.bnote{position:absolute;right:-6px;top:-8px;width:26px;height:26px;border-radius:8px;background:var(--sw-yellow);color:#3B3200;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.25);z-index:2;font-family:-apple-system,system-ui,sans-serif;}
+.bnote{position:absolute;right:-6px;top:-8px;width:26px;height:26px;border-radius:8px;background:var(--sw-yellow);color:#3B3200;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.25);z-index:2;font-family:var(--sans);}
 sup,sub{font-size:.7em;line-height:0;}
 article ::selection{background:rgba(31,111,99,.3);}
 .reading-progress{position:absolute;left:0;top:0;height:2px;background:var(--accent);width:0;z-index:5;}
@@ -134,7 +156,11 @@ article ::selection{background:rgba(31,111,99,.3);}
 .swatch{width:34px;height:34px;border-radius:50%;border:2px solid rgba(0,0,0,.08);flex:none;}
 .swatch.on{outline:3px solid var(--accent);outline-offset:2px;}
 .swatch[data-color="yellow"]{background:var(--sw-yellow);} .swatch[data-color="green"]{background:var(--sw-green);}
-.swatch[data-color="blue"]{background:var(--sw-blue);} .swatch[data-color="pink"]{background:var(--sw-pink);}
+.swatch[data-color="blue"]{background:var(--sw-blue);} .swatch[data-color="pink"]{background:var(--sw-pink);} .swatch[data-color="orange"]{background:var(--sw-orange);}
+.selbar.ul .swatch{background:transparent!important;box-shadow:inset 0 -6px 0 var(--c);}
+.selbar .stylebtn{width:40px;height:34px;border-radius:9px;border:1px solid var(--line);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none;}
+.selbar .stylebtn .mk{background:var(--sw-yellow);padding:0 3px;border-radius:2px;color:#1B1A17;} .selbar .stylebtn .un{display:none;border-bottom:3px solid var(--sw-yellow);padding:0 3px;}
+.selbar.ul .stylebtn .mk{display:none;} .selbar.ul .stylebtn .un{display:inline;}
 .selbar .sep{width:1px;height:26px;background:var(--line);}
 .selbar .txt{font-weight:600;font-size:14px;padding:6px 8px;border-radius:8px;white-space:nowrap;}
 #readerWrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;}
@@ -207,7 +233,7 @@ article ::selection{background:rgba(31,111,99,.3);}
     <header class="topbar">
       <h1>Lector</h1>
       <button id="importBtn" class="primary">Importar PDF</button>
-      <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple hidden>
+      <input type="file" id="fileInput" accept="application/pdf,.pdf,.lector,application/json" multiple hidden>
     </header>
     <div id="chips" class="chips"></div>
     <div id="docList" class="doclist"></div>
@@ -235,10 +261,12 @@ article ::selection{background:rgba(31,111,99,.3);}
       <div id="scroll"><article id="art"></article></div>
       <div id="selbar" class="selbar" hidden>
         <button class="swatch" data-color="yellow" aria-label="Subrayar amarillo"></button>
+        <button class="swatch" data-color="orange" aria-label="Subrayar naranja"></button>
         <button class="swatch" data-color="green" aria-label="Subrayar verde"></button>
         <button class="swatch" data-color="blue" aria-label="Subrayar azul"></button>
         <button class="swatch" data-color="pink" aria-label="Subrayar rosa"></button>
         <span class="sep"></span>
+        <button class="stylebtn" data-style="toggle" aria-label="Marcador o línea"><span class="mk">ab</span><span class="un">ab</span></button>
         <button class="txt" data-color="note">+ Nota</button>
       </div>
     </div>
@@ -783,8 +811,10 @@ function groupCaptions(capLines, pg, body) {
 /* ---------- 7. Continuaciones entre columnas/páginas y clasificación ---------- */
 function mergeContinuations(blocks) {
   for (let i = 1; i < blocks.length; i++) {
-    const a = blocks[i - 1], b = blocks[i];
-    if (a.type !== "p" || b.type !== "p") continue;
+    const b = blocks[i]; if (b.type !== "p") continue;
+    let j = i - 1; while (j >= 0 && blocks[j].type === "fig") j--;   // salta figuras intercaladas
+    if (j < 0) continue;
+    const a = blocks[j]; if (a.type !== "p") continue;
     if (Math.abs(a.size - b.size) > 0.6 || a.bold !== b.bold) continue;
     const aFull = a.width >= (a.colW || a.width) * 0.8;
     const endsOpen = !/[.!?:”"’)\]]\s*$/.test(a.text) || /[A-Za-zÀ-ÿ]-$/.test(a.text);
@@ -798,7 +828,8 @@ function mergeContinuations(blocks) {
       if (joiner) a.runs.push({ s: joiner, r: null });
       a.runs.push(...b.runs); a.spans.push(...b.spans.map(sp => ({ k: sp.k, s: sp.s + off, e: sp.e + off })));
       a.nlines += b.nlines; a.pageEnd = b.page;
-      blocks.splice(i, 1); i--;
+      blocks.splice(i, 1);
+      i--;
     }
   }
 }
@@ -831,10 +862,10 @@ function classify(blocks, body, pages) {
    ===================================================================== */
 const $ = (s, el = document) => el.querySelector(s);
 const AUTHOR = "Rodri";
-const COLORS = { yellow: [1, 0.89, 0.36], green: [0.62, 0.89, 0.61], blue: [0.61, 0.80, 1], pink: [1, 0.70, 0.78] };
-const SW = { yellow: "#FFE45C", green: "#9EE39B", blue: "#9CCBFF", pink: "#FFB3C7" };
-let lastColor = "yellow";
-const DEFAULT_PREFS = { fs: 18, lh: 1.55, sans: false, theme: "auto" };
+const COLORS = { yellow: [1, 0.89, 0.36], orange: [1, 0.62, 0.30], green: [0.62, 0.89, 0.61], blue: [0.61, 0.80, 1], pink: [1, 0.70, 0.78] };
+const SW = { yellow: "#FFE45C", orange: "#FFA04D", green: "#9EE39B", blue: "#9CCBFF", pink: "#FFB3C7" };
+let lastColor = "yellow", lastStyle = "hl";   // "hl" marcador · "ul" línea
+const DEFAULT_PREFS = { fs: 18, lh: 1.55, sans: false, theme: "auto", hideCaps: false };
 const prefs = loadPrefs();
 
 /* ---------------- Almacenamiento (IndexedDB) ---------------- */
@@ -1006,6 +1037,7 @@ async function importFiles(files) {
   for (const f of files) {
     try {
       progress(0, `Abriendo ${f.name}…`);
+      if (/\.(lector|json)$/i.test(f.name)) { await importPackage(f); continue; }
       const buf = await f.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
       const id = uid();
@@ -1031,6 +1063,29 @@ async function importFiles(files) {
   renderLibrary();
 }
 $("#fileInput").addEventListener("change", e => { importFiles([...e.target.files]); e.target.value = ""; });
+/* Paquete .lector preparado en el Mac (texto adaptado + tablas HTML + figuras recortadas + PDF original) */
+async function importPackage(f) {
+  const pkg = JSON.parse(await f.text());
+  if (pkg.format !== "lector/1") throw new Error("Formato de paquete no reconocido");
+  progress(0.3, "Guardando figuras…");
+  const id = uid(); const reflow = pkg.reflow; const images = [];
+  const toBlob = dataUrl => { const [h, b64] = dataUrl.split(","); const mime = h.match(/data:([^;]+)/)[1]; const bin = atob(b64); const arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i); return new Blob([arr], { type: mime }); };
+  for (const b of reflow.blocks) {
+    if (b.type === "fig" || b.type === "table") {
+      if (b.img && typeof b.img === "string") { images.push([`${id}/${b.id}`, toBlob(b.img)]); b.img = true; }
+      if (b.panels) b.panels.forEach((pn, i) => { if (pn.img && typeof pn.img === "string") { images.push([`${id}/${b.id}/p${i}`, toBlob(pn.img)]); pn.img = true; } });
+    }
+  }
+  const pdfBytes = toBlob("data:application/pdf;base64," + pkg.pdf); const buf = await pdfBytes.arrayBuffer();
+  progress(0.7, "Leyendo subrayados previos…");
+  let annots = [];
+  try { const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise; annots = await importExistingAnnots(pdf, reflow); pdf.destroy(); } catch (e) { console.warn(e); }
+  const meta = { id, name: pkg.name || f.name.replace(/\.lector$/i, ""), file: pkg.file || f.name, pages: pkg.pages || reflow.pages, size: buf.byteLength, added: Date.now(), opened: 0, pos: null, annots, status: "unread", lists: [], prepared: true };
+  await DB.putFile(id, buf); await DB.putReflow(id, reflow);
+  for (const [k, blob] of images) await DB.putImage(k, blob);
+  await DB.putMeta(meta);
+  progress(null); toast(annots.length ? `Importado (preparado) con ${annots.length} anotaciones` : "Importado (preparado)");
+}
 $("#importBtn").addEventListener("click", () => $("#fileInput").click());
 $("#importBtn2").addEventListener("click", () => $("#fileInput").click());
 
@@ -1100,10 +1155,10 @@ async function importExistingAnnots(pdf, reflow) {
   for (let p = 1; p <= pdf.numPages; p++) {
     let list; try { list = await (await pdf.getPage(p)).getAnnotations(); } catch { continue; }
     for (const a of list) {
-      if (a.subtype === "Highlight") {
+      if (a.subtype === "Highlight" || a.subtype === "Underline") {
         const rects = quadsToRects(a.quadPoints, a.rect); if (!rects.length) continue;
         const hit = locateRects(reflow, p, rects); if (!hit) continue;
-        out.push({ id: uid(), block: hit.block, s: hit.s, e: hit.e, text: hit.text, color: nearestColor(a.color), note: a.contentsObj?.str || a.contents || "", created: Date.now() });
+        out.push({ id: uid(), block: hit.block, s: hit.s, e: hit.e, text: hit.text, color: nearestColor(a.color), style: a.subtype === "Underline" ? "ul" : "hl", note: a.contentsObj?.str || a.contents || "", created: Date.now() });
       } else if (a.subtype === "Text" && !a.inReplyTo) {
         const b = reflow.blocks.find(b => b.page === p && b.type !== "fig") || reflow.blocks[0];
         if (b) out.push({ id: uid(), block: b.id, s: 0, e: 0, text: "", color: "yellow", note: a.contentsObj?.str || a.contents || "", created: Date.now() });
@@ -1125,8 +1180,10 @@ function locateRects(reflow, page, rects) {
           for (const [rx0, ry0, rx1, ry1] of rects) {
             if (cy < ry0 - 1 || cy > ry1 + 1) continue;
             const ox0 = Math.max(x0, rx0), ox1 = Math.min(x1, rx1); if (ox1 - ox0 < Math.min(2, w * 0.5)) continue;
-            // parte del run cubierta por el rectángulo, en caracteres (proporcional)
-            const cs = pos + Math.round((ox0 - x0) / w * len), ce = pos + Math.round((ox1 - x0) / w * len);
+            // runs de una palabra (paquetes preparados): la palabra entra entera si el rectángulo cubre más de la mitad
+            let cs, ce;
+            if (len <= 25 && !/\s/.test(r.s)) { if ((ox1 - ox0) < 0.5 * w) continue; cs = pos; ce = pos + len; }
+            else { cs = pos + Math.round((ox0 - x0) / w * len); ce = pos + Math.round((ox1 - x0) / w * len); }
             if (s < 0 || cs < s) s = cs; if (ce > e) e = ce;
           }
         }
@@ -1137,7 +1194,7 @@ function locateRects(reflow, page, rects) {
   }
   return best;
 }
-function blockRunSets(b) { if (b.type === "fig") return b.caption ? [[b.id + "c", b.captionRuns, b.caption]] : []; return [[b.id, b.runs, b.text]]; }
+function blockRunSets(b) { if (b.type === "fig" || b.type === "table") return b.caption && b.captionRuns ? [[b.id + "c", b.captionRuns, b.caption]] : []; return [[b.id, b.runs, b.text]]; }
 function quadsToRects(q, rect) {
   if (!q) return rect ? [[Math.min(rect[0], rect[2]), Math.min(rect[1], rect[3]), Math.max(rect[0], rect[2]), Math.max(rect[1], rect[3])]] : [];
   const rects = [];
@@ -1163,7 +1220,7 @@ async function openDoc(id) {
   const reflow = await DB.getReflow(id); if (!reflow) { toast("Este documento es de una versión anterior: impórtalo de nuevo"); return; }
   closeReader(false);
   R.doc = meta; R.reflow = reflow; R.blockIndex = new Map();
-  for (const b of reflow.blocks) { R.blockIndex.set(b.id, b); if (b.type === "fig" && b.caption) R.blockIndex.set(b.id + "c", { id: b.id + "c", type: "caption", text: b.caption, runs: b.captionRuns, spans: b.captionSpans, page: b.page }); }
+  for (const b of reflow.blocks) { R.blockIndex.set(b.id, b); if ((b.type === "fig" || b.type === "table") && b.caption) R.blockIndex.set(b.id + "c", { id: b.id + "c", type: "caption", text: b.caption, runs: b.captionRuns, spans: b.captionSpans, page: b.page }); }
   $("#library").hidden = true; $("#reader").hidden = false;
   $("#docTitle").textContent = meta.name; $("#pageTotal").textContent = meta.pages;
   meta.opened = Date.now(); DB.putMeta(meta);
@@ -1186,7 +1243,7 @@ async function renderArticle() {
   for (const b of R.reflow.blocks) {
     if (b.page !== lastPage && b.type !== "title") { const pm = document.createElement("div"); pm.className = "pagemark"; pm.textContent = `p. ${b.page}`; pm.dataset.page = b.page; (refsBox || frag).appendChild(pm); lastPage = b.page; }
     if (b.type === "ref" && !refsBox) { refsBox = document.createElement("details"); refsBox.className = "refs"; refsBox.innerHTML = `<summary>Referencias (${R.reflow.blocks.filter(x => x.type === "ref").length})</summary>`; frag.appendChild(refsBox); }
-    const el = b.type === "fig" ? await figureEl(b) : blockEl(b);
+    const el = b.type === "fig" ? await figureEl(b) : b.type === "table" ? await tableEl(b) : blockEl(b);
     (b.type === "ref" && refsBox ? refsBox : frag).appendChild(el);
   }
   art.replaceChildren(frag);
@@ -1195,6 +1252,7 @@ function blockEl(b) {
   const wrap = document.createElement("div"); wrap.className = "blk " + b.type; wrap.dataset.b = b.id;
   const tag = b.type === "title" ? "h1" : (b.type === "h1" || b.type === "h2") ? "h2" : b.type === "h3" ? "h3" : "p";
   wrap.innerHTML = `<${tag} class="tx">${textHtml(b, b.id)}</${tag}>`;
+  if (b.type === "footnote") wrap.insertAdjacentHTML("afterbegin", '<span class="kindtag">Nota</span>');
   addBlockNotes(wrap, b.id);
   return wrap;
 }
@@ -1204,17 +1262,47 @@ async function figureEl(b) {
   const src = await imgUrl(`${R.doc.id}/${b.id}`, b.img);
   const label = isTable ? (b.caption?.match(/^(table|tabla)\s*S?\d+[A-Za-z]?/i)?.[0] || "Tabla") : (b.caption?.match(/^(fig(?:ure|\.)?|figura)\s*S?\d+[A-Za-z]?/i)?.[0] || "Figura");
   const panels = !isTable && b.panels ? b.panels : null;
+  const hidden = capHidden(b.id);
   let strip = "";
   if (panels) {
     const urls = await Promise.all(panels.map((pn, i) => imgUrl(`${R.doc.id}/${b.id}/p${i}`, pn.img)));
-    strip = `<div class="panelstrip">${panels.map((pn, i) => `<button data-i="${i}" style="background-image:url('${urls[i] || ""}')" aria-label="Panel ${pn.label}"><b>${esc(pn.label)}</b></button>`).join("")}</div>`;
+    strip = `<div class="panelstrip">${panels.map((pn, i) => `<button data-i="${i}" style="background-image:url('${urls[i] || ""}')" aria-label="Viñeta ${pn.label}"><b>${esc(pn.label || String(i + 1))}</b></button>`).join("")}</div>`;
   }
-  fig.innerHTML = `<div class="wrap">${src ? `<img class="fig" src="${src}" alt="${esc(label)} de la página ${b.page}"><span class="kind">${esc(label)}${panels ? " · " + panels.length + " paneles" : ""}</span><span class="zoomhint">${isTable ? "Abrir tabla" : "Ampliar"}</span>` : `<div class="fig nomatch">${esc(label)} de la página ${b.page} (ver página original)</div>`}</div>
+  fig.innerHTML = `<div class="fighead"><span class="kindtag">${esc(label)}${panels ? ` · ${panels.length} viñetas` : ""}</span><span class="spacer"></span><button class="capbtn" aria-label="Mostrar u ocultar pie">${hidden ? "Mostrar pie" : "Ocultar pie"}</button><button class="zoombtn">${isTable ? "Abrir tabla" : "Ampliar"}</button></div>
+    <div class="wrap">${src ? `<img class="fig" src="${src}" alt="${esc(label)} de la página ${b.page}">` : `<div class="fig nomatch">${esc(label)} de la página ${b.page} (ver página original)</div>`}</div>
     ${strip}
-    ${b.caption ? `<figcaption class="tx" data-b="${b.id}c">${textHtml({ text: b.caption, spans: b.captionSpans || [] }, b.id + "c")}</figcaption>` : ""}`;
-  $(".wrap", fig).addEventListener("click", () => src ? openFigure(b, 0) : openPageViewer(b.page));
+    ${b.caption ? `<figcaption class="tx" data-b="${b.id}c" ${hidden ? "hidden" : ""}>${textHtml({ text: b.caption, spans: b.captionSpans || [] }, b.id + "c")}</figcaption>` : ""}`;
+  const open = () => src ? openFigure(b, 0) : openPageViewer(b.page);
+  $(".wrap", fig).addEventListener("click", open); $(".zoombtn", fig).addEventListener("click", open);
+  $(".capbtn", fig).addEventListener("click", () => toggleCap(fig, b.id));
   fig.querySelectorAll(".panelstrip button").forEach(bt => bt.addEventListener("click", () => openFigure(b, +bt.dataset.i)));
   return fig;
+}
+/* Tabla preparada en el Mac: HTML real (desplazable) con pie y nota; "Ampliar" abre la imagen original */
+async function tableEl(b) {
+  const fig = document.createElement("figure"); fig.className = "blk fig table htmltable"; fig.dataset.b = b.id;
+  const label = b.caption?.match(/^(table|tabla)\s*S?\d+[A-Za-z]?/i)?.[0] || "Tabla";
+  const hidden = capHidden(b.id);
+  fig.innerHTML = `<div class="fighead"><span class="kindtag">${esc(label)}</span><span class="spacer"></span><button class="capbtn" aria-label="Mostrar u ocultar pie">${hidden ? "Mostrar pie" : "Ocultar pie"}</button>${b.img ? '<button class="zoombtn">Ampliar</button>' : ""}</div>
+    <div class="tablewrap">${sanitizeTable(b.html || "")}</div>
+    ${b.caption ? `<figcaption class="tx" data-b="${b.id}c" ${hidden ? "hidden" : ""}>${textHtml({ text: b.caption, spans: b.captionSpans || [] }, b.id + "c")}</figcaption>` : ""}
+    ${b.note ? `<div class="tnote" ${hidden ? "hidden" : ""}>${esc(b.note)}</div>` : ""}`;
+  $(".zoombtn", fig)?.addEventListener("click", () => openFigure(b, 0));
+  $(".capbtn", fig).addEventListener("click", () => toggleCap(fig, b.id));
+  return fig;
+}
+function sanitizeTable(html) {
+  const doc = new DOMParser().parseFromString(html, "text/html"); const t = doc.querySelector("table"); if (!t) return "";
+  t.querySelectorAll("*").forEach(el => { for (const at of [...el.attributes]) if (!/^(rowspan|colspan)$/i.test(at.name)) el.removeAttribute(at.name); });
+  t.querySelectorAll("script,style").forEach(x => x.remove());
+  return t.outerHTML;
+}
+const capState = new Map();
+function capHidden(bid) { if (capState.has(bid)) return capState.get(bid); return !!prefs.hideCaps; }
+function toggleCap(fig, bid) {
+  const hidden = !capHidden(bid); capState.set(bid, hidden);
+  fig.querySelectorAll("figcaption,.tnote").forEach(x => x.hidden = hidden);
+  const bt = $(".capbtn", fig); if (bt) bt.textContent = hidden ? "Mostrar pie" : "Ocultar pie";
 }
 async function imgUrl(key, has) {
   if (!has) return null;
@@ -1223,7 +1311,7 @@ async function imgUrl(key, has) {
 }
 /* Abre una figura en la galería: con viñetas, una por pantalla con su parte del pie; "Completa" muestra la figura entera */
 async function openFigure(b, index) {
-  const isTable = b.kind === "table";
+  const isTable = b.kind === "table" || b.type === "table";
   const full = await imgUrl(`${R.doc.id}/${b.id}`, b.img);
   const num = b.caption?.match(/^(?:fig(?:ure|\.)?|figura|table|tabla)\s*S?\d+[A-Za-z]?/i)?.[0] || (isTable ? "Tabla" : "Figura");
   const common = b.captionCommon || b.caption || "";
@@ -1255,7 +1343,7 @@ function textHtml(b, bid) {
     const a = annots.filter(x => x.s <= s && x.e >= e).sort((x, y) => y.created - x.created)[0];
     let inner = seg; for (const k of tags) inner = `<${k}>${inner}</${k}>`;
     const noted = a && a.note && a.e === e;
-    html += a ? `<span class="hl ${a.color}${noted ? " noted" : ""}" data-id="${a.id}">${inner}</span>` : inner;
+    html += a ? `<span class="hl ${a.color}${a.style === "ul" ? " ul" : ""}${noted ? " noted" : ""}" data-id="${a.id}">${inner}</span>` : inner;
   }
   return html;
 }
@@ -1265,9 +1353,10 @@ function addBlockNotes(wrap, bid) {
   notes.forEach((a, i) => { const c = document.createElement("button"); c.className = "bnote"; c.dataset.id = a.id; c.textContent = "✎"; c.style.top = (-8 + 30 * i) + "px"; c.setAttribute("aria-label", "Nota"); wrap.appendChild(c); });
 }
 function rerenderBlock(bid) {
-  const base = bid.endsWith("c") && R.blockIndex.get(bid.slice(0, -1))?.type === "fig" ? bid.slice(0, -1) : bid;
+  const base = bid.endsWith("c") && ["fig", "table"].includes(R.blockIndex.get(bid.slice(0, -1))?.type) ? bid.slice(0, -1) : bid;
   const el = art.querySelector(`[data-b="${base}"]`); if (!el) return;
   if (base !== bid) { const cap = $("figcaption", el); const b = R.blockIndex.get(base); if (cap) cap.innerHTML = textHtml({ text: b.caption, spans: b.captionSpans || [] }, bid); return; }
+  if (R.blockIndex.get(bid)?.type === "table" || R.blockIndex.get(bid)?.type === "fig") return;
   const b = R.blockIndex.get(bid); $(".tx", el).innerHTML = textHtml(b, bid); addBlockNotes(el, bid);
 }
 
@@ -1309,12 +1398,15 @@ document.addEventListener("selectionchange", () => {
     const range = sel.getRangeAt(0);
     if (!art.contains(range.commonAncestorContainer)) { bar.hidden = true; return; }
     lastRange = range.cloneRange(); bar.hidden = false;
-    bar.querySelectorAll(".swatch").forEach(b => b.classList.toggle("on", b.dataset.color === lastColor));
+    bar.querySelectorAll(".swatch").forEach(b => { b.classList.toggle("on", b.dataset.color === lastColor); b.style.setProperty("--c", SW[b.dataset.color]); });
+    bar.classList.toggle("ul", lastStyle === "ul");
   }, 120);
 });
 /* Los botones actúan en touchstart/mousedown para que iOS no borre la selección antes del clic */
 let lastAct = 0;
 function selAction(e) {
+  const st = e.target.closest("[data-style]");
+  if (st) { e.preventDefault(); e.stopPropagation(); lastStyle = lastStyle === "hl" ? "ul" : "hl"; $("#selbar").classList.toggle("ul", lastStyle === "ul"); return; }
   const btn = e.target.closest("[data-color]"); if (!btn) return;
   e.preventDefault(); e.stopPropagation();
   if (Date.now() - lastAct < 400) return; lastAct = Date.now();
@@ -1344,7 +1436,7 @@ function rangeToAnnots(range, color) {
     const text = b.text.slice(s, e).trim(); if (!text || e <= s) continue;
     // recorta espacios en los extremos
     const lead = b.text.slice(s, e).length - b.text.slice(s, e).trimStart().length, trail = b.text.slice(s, e).length - b.text.slice(s, e).trimEnd().length;
-    out.push({ id: uid(), block: bid, s: s + lead, e: e - trail, text, color, note: "", created: Date.now() });
+    out.push({ id: uid(), block: bid, s: s + lead, e: e - trail, text, color, style: lastStyle, note: "", created: Date.now() });
   }
   return out;
 }
@@ -1367,7 +1459,8 @@ function annotSheet(a, focusNote = false) {
   const isNote = a.e === a.s; const b = R.blockIndex.get(a.block);
   const sh = openSheet(`<h2>${isNote ? "Nota" : "Subrayado"} · p. ${b?.page ?? "?"}</h2>
     ${isNote ? "" : `<div class="quote" style="border-color:${SW[a.color]}">${esc(a.text)}</div>
-    <div class="swatches">${Object.keys(SW).map(c => `<button class="swatch ${c === a.color ? "on" : ""}" data-color="${c}" aria-label="${c}"></button>`).join("")}</div>`}
+    <div class="swatches">${Object.keys(SW).map(c => `<button class="swatch ${c === a.color ? "on" : ""}" data-color="${c}" aria-label="${c}"></button>`).join("")}</div>
+    <div class="seg" style="margin-bottom:4px"><button data-style="hl" class="${a.style !== "ul" ? "on" : ""}">Marcador</button><button data-style="ul" class="${a.style === "ul" ? "on" : ""}">Línea</button></div>`}
     <div class="label">Nota</div>
     <textarea id="noteIn" placeholder="Idea clave, pregunta para Anki, duda…">${esc(a.note)}</textarea>
     <div class="row"><button class="ghost danger" data-a="del">Eliminar</button><button class="primary" data-a="ok">Guardar</button></div>`);
@@ -1375,6 +1468,8 @@ function annotSheet(a, focusNote = false) {
   sh.addEventListener("click", e => {
     const sw = e.target.closest(".swatch");
     if (sw) { a.color = sw.dataset.color; lastColor = a.color; sh.querySelectorAll(".swatch").forEach(x => x.classList.toggle("on", x === sw)); $(".quote", sh).style.borderColor = SW[a.color]; DB.putMeta(R.doc); rerenderBlock(a.block); return; }
+    const stb = e.target.closest("[data-style]");
+    if (stb) { a.style = stb.dataset.style; lastStyle = a.style; stb.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === stb)); DB.putMeta(R.doc); rerenderBlock(a.block); return; }
     const act = e.target.closest("[data-a]")?.dataset.a; if (!act) return;
     if (act === "ok") { a.note = ta.value.trim(); DB.putMeta(R.doc); rerenderBlock(a.block); toast("Guardado"); }
     if (act === "del") { R.doc.annots = R.doc.annots.filter(x => x !== a); DB.putMeta(R.doc); rerenderBlock(a.block); toast("Eliminado"); }
@@ -1405,12 +1500,14 @@ $("#fontBtn").addEventListener("click", () => {
     <div class="label">Tamaño</div><div class="seg"><button data-fs="-1">A−</button><button data-fs="+1">A+</button></div>
     <div class="label">Interlineado</div><div class="seg"><button data-lh="1.35" class="${prefs.lh == 1.35 ? "on" : ""}">Compacto</button><button data-lh="1.55" class="${prefs.lh == 1.55 ? "on" : ""}">Normal</button><button data-lh="1.8" class="${prefs.lh == 1.8 ? "on" : ""}">Amplio</button></div>
     <div class="label">Tipografía</div><div class="seg"><button data-sans="0" class="${!prefs.sans ? "on" : ""}">Serif</button><button data-sans="1" class="${prefs.sans ? "on" : ""}">Sans</button></div>
+    <div class="label">Pies de figuras y tablas</div><div class="seg"><button data-caps="0" class="${!prefs.hideCaps ? "on" : ""}">Visibles</button><button data-caps="1" class="${prefs.hideCaps ? "on" : ""}">Ocultos</button></div>
     <div class="label">Tema</div><div class="seg"><button data-theme="auto" class="${prefs.theme === "auto" ? "on" : ""}">Automático</button><button data-theme="light" class="${prefs.theme === "light" ? "on" : ""}">Claro</button><button data-theme="dark" class="${prefs.theme === "dark" ? "on" : ""}">Oscuro</button></div>`);
   sh.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     if (b.dataset.fs) prefs.fs = Math.max(13, Math.min(30, prefs.fs + (+b.dataset.fs)));
     if (b.dataset.lh) { prefs.lh = +b.dataset.lh; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); }
     if (b.dataset.sans != null) { prefs.sans = b.dataset.sans === "1"; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); }
+    if (b.dataset.caps != null) { prefs.hideCaps = b.dataset.caps === "1"; capState.clear(); b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); art.querySelectorAll("figure").forEach(f => { f.querySelectorAll("figcaption,.tnote").forEach(x => x.hidden = prefs.hideCaps); const bt = $(".capbtn", f); if (bt) bt.textContent = prefs.hideCaps ? "Mostrar pie" : "Ocultar pie"; }); }
     if (b.dataset.theme) { prefs.theme = b.dataset.theme; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); }
     savePrefs();
   });
@@ -1446,7 +1543,7 @@ $("#menuBtn").addEventListener("click", () => {
 function openViewer({ src, canvas, title }) { openGallery([{ src, canvas, title, caption: "" }], 0); }
 function openGallery(items, start = 0, fullItem = null) {
   const v = document.createElement("div"); v.className = "viewer";
-  v.innerHTML = `<div class="vbar"><button class="icon close" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="t"></div>${fullItem ? '<button class="pillw full">Ver completa</button>' : ""}</div>
+  v.innerHTML = `<div class="vbar"><button class="icon close" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="t"></div><button class="pillw capv">Pie</button>${fullItem ? '<button class="pillw full">Ver completa</button>' : ""}</div>
     <div class="stage"></div>
     <div class="navbar" hidden><button class="nb prev"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg> Anterior</button><div class="pos"></div><button class="nb next">Siguiente <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div>
     <div class="cap" hidden></div>`;
@@ -1467,7 +1564,7 @@ function openGallery(items, start = 0, fullItem = null) {
     el = it.canvas || Object.assign(new Image(), { src: it.src }); el.draggable = false; stage.appendChild(el);
     pz = panZoom(stage, el, { onSwipe: d => { if (showingFull) return; if (d < 0 && i < items.length - 1) { i++; show(); } else if (d > 0 && i > 0) { i--; show(); } } });
     $(".t", v).textContent = it.title || "";
-    cap.hidden = !it.caption; cap.innerHTML = it.caption || ""; cap.scrollTop = 0;
+    cap.hidden = !it.caption || !capOn; cap.innerHTML = it.caption || ""; cap.scrollTop = 0;
     nav.hidden = showingFull || items.length < 2; prev.disabled = i === 0; next.disabled = i === items.length - 1; pos.textContent = it.sub || `${i + 1}/${items.length}`;
     if (fullBtn) fullBtn.textContent = showingFull ? "Ver viñetas" : "Ver completa";
     if (it.canvas || el.complete) fit(); else el.onload = fit;
@@ -1476,6 +1573,7 @@ function openGallery(items, start = 0, fullItem = null) {
   prev.addEventListener("click", () => { if (i > 0) { i--; show(); } });
   next.addEventListener("click", () => { if (i < items.length - 1) { i++; show(); } });
   fullBtn?.addEventListener("click", () => { showingFull = !showingFull; show(); });
+  let capOn = !prefs.hideCaps; $(".capv", v).addEventListener("click", () => { capOn = !capOn; cap.hidden = !capOn || !cur().caption; $(".capv", v).classList.toggle("off", !capOn); });
   const onResize = () => fit(); window.addEventListener("resize", onResize);
   const obs = new MutationObserver(() => { if (!document.body.contains(v)) { window.removeEventListener("resize", onResize); obs.disconnect(); } }); obs.observe(document.body, { childList: true });
   show();
@@ -1578,11 +1676,11 @@ async function buildAnnotatedPdf(d, reflow) {
   for (const p of pages) {   // el modelo de la app sustituye a las Highlight/Text existentes (se importaron al abrir)
     const annots = p.node.Annots(); if (!annots) continue;
     const keep = ctx.obj([]);
-    for (let i = 0; i < annots.size(); i++) { const ref = annots.get(i); const dict = ctx.lookup(ref); const st = dict?.get?.(PDFName.of("Subtype"))?.toString?.(); if (st === "/Highlight" || st === "/Text" || st === "/Popup") continue; keep.push(ref); }
+    for (let i = 0; i < annots.size(); i++) { const ref = annots.get(i); const dict = ctx.lookup(ref); const st = dict?.get?.(PDFName.of("Subtype"))?.toString?.(); if (st === "/Highlight" || st === "/Underline" || st === "/Text" || st === "/Popup") continue; keep.push(ref); }
     p.node.set(PDFName.of("Annots"), keep);
   }
   const gsRef = ctx.register(ctx.obj({ Type: "ExtGState", BM: "Multiply", CA: 1, ca: 1 }));
-  const index = new Map(); for (const b of reflow.blocks) { index.set(b.id, b); if (b.type === "fig" && b.caption) index.set(b.id + "c", { runs: b.captionRuns, page: b.page }); }
+  const index = new Map(); for (const b of reflow.blocks) { index.set(b.id, b); if ((b.type === "fig" || b.type === "table") && b.caption) index.set(b.id + "c", { runs: b.captionRuns, page: b.page }); }
   for (const a of d.annots) {
     const block = index.get(a.block); if (!block) continue;
     const common = { Type: "Annot", F: 4, T: PDFHexString.fromText(AUTHOR), Contents: PDFHexString.fromText(a.note || ""), M: PDFString.fromDate(new Date(a.created || Date.now())), CA: 1 };
@@ -1593,9 +1691,11 @@ async function buildAnnotatedPdf(d, reflow) {
         const [r, g, b] = COLORS[a.color] || COLORS.yellow;
         const rect = [Math.min(...rects.map(x => x[0])), Math.min(...rects.map(x => x[1])), Math.max(...rects.map(x => x[2])), Math.max(...rects.map(x => x[3]))];
         const quads = rects.flatMap(([x1, y1, x2, y2]) => [x1, y2, x2, y2, x1, y1, x2, y1]);
-        const content = `/GS gs ${r} ${g} ${b} rg ` + rects.map(([x1, y1, x2, y2]) => `${x1.toFixed(2)} ${y1.toFixed(2)} ${(x2 - x1).toFixed(2)} ${(y2 - y1).toFixed(2)} re f`).join(" ");
+        const ul = a.style === "ul";
+        const content = ul ? `${r} ${g} ${b} RG 1.5 w ` + rects.map(([x1, y1, x2, y2]) => `${x1.toFixed(2)} ${(y1 + 1).toFixed(2)} m ${x2.toFixed(2)} ${(y1 + 1).toFixed(2)} l S`).join(" ")
+                           : `/GS gs ${r} ${g} ${b} rg ` + rects.map(([x1, y1, x2, y2]) => `${x1.toFixed(2)} ${y1.toFixed(2)} ${(x2 - x1).toFixed(2)} ${(y2 - y1).toFixed(2)} re f`).join(" ");
         const ap = ctx.stream(content, { Type: "XObject", Subtype: "Form", BBox: rect, Resources: { ExtGState: { GS: gsRef } } });
-        const annot = ctx.obj({ ...common, Contents: PDFHexString.fromText(first ? (a.note || "") : ""), Subtype: "Highlight", Rect: rect, QuadPoints: quads, C: [r, g, b], P: page.ref, NM: PDFString.of(a.id + (first ? "" : "-" + pn)), AP: { N: ctx.register(ap) } });
+        const annot = ctx.obj({ ...common, Contents: PDFHexString.fromText(first ? (a.note || "") : ""), Subtype: ul ? "Underline" : "Highlight", Rect: rect, QuadPoints: quads, C: [r, g, b], P: page.ref, NM: PDFString.of(a.id + (first ? "" : "-" + pn)), AP: { N: ctx.register(ap) } });
         page.node.addAnnot(ctx.register(annot)); first = false;
       }
     } else {
