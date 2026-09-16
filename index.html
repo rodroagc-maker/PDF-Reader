@@ -60,6 +60,17 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .pill{font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--muted);padding:6px 9px;border-radius:999px;border:1px solid var(--line);flex:none;white-space:nowrap;}
 
 /* ---------- Library ---------- */
+.chips{display:flex;gap:8px;padding:10px 16px 2px;overflow-x:auto;flex:none;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{flex:none;padding:7px 13px;border-radius:999px;border:1px solid var(--line);font-size:13.5px;font-weight:600;color:var(--muted);background:var(--surface);white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
+.chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+.chip .cnt{font-weight:500;opacity:.75;font-variant-numeric:tabular-nums;}
+.chip.add{color:var(--accent);border-style:dashed;}
+.doc .status{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;margin-right:-4px;}
+.doc.read .status{visibility:hidden;}
+.sheet .check{display:flex;align-items:center;gap:12px;width:100%;padding:12px 4px;border-bottom:1px solid var(--line);text-align:left;font-size:15.5px;}
+.sheet .check .box{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;color:var(--accent-ink);font-size:14px;}
+.sheet .check.on .box{background:var(--accent);border-color:var(--accent);}
 .doclist{flex:1;overflow:auto;padding:12px 16px 40px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
 .doc{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 8px 12px 14px;text-align:left;width:100%;}
 .doc:active{background:var(--line);}
@@ -98,6 +109,12 @@ figure{margin:1.2em 0;}
 figure .fig{display:block;width:100%;height:auto;border-radius:8px;background:#fff;border:1px solid var(--line);}
 figure .fig.nomatch{padding:24px;box-sizing:border-box;text-align:center;color:var(--muted);font-size:.9em;}
 figcaption{font-size:.84em;color:var(--muted);line-height:1.45;margin-top:.5em;}
+figure.table .fig{max-height:38vh;object-fit:cover;object-position:top left;}
+figure .kind{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:4px 8px;font-size:12px;font-family:-apple-system,system-ui,sans-serif;}
+figure .panelstrip{display:flex;gap:6px;margin-top:6px;overflow-x:auto;scrollbar-width:none;}
+figure .panelstrip::-webkit-scrollbar{display:none;}
+figure .panelstrip button{flex:none;width:64px;height:64px;border-radius:8px;border:1px solid var(--line);background:#fff center/cover no-repeat;position:relative;overflow:hidden;}
+figure .panelstrip button b{position:absolute;left:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:1px 6px;border-radius:0 6px 0 0;font-family:-apple-system,system-ui,sans-serif;}
 figure .zoomhint{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:4px 8px;font-size:12px;font-family:-apple-system,system-ui,sans-serif;}
 figure .wrap{position:relative;}
 .pagemark{text-align:right;font-size:11.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:1.6em 0 .6em;font-family:-apple-system,system-ui,sans-serif;font-variant-numeric:tabular-nums;border-top:1px dashed var(--line);padding-top:4px;}
@@ -127,8 +144,20 @@ article ::selection{background:rgba(31,111,99,.3);}
 .viewer .vbar{display:flex;align-items:center;gap:8px;padding:calc(8px + env(safe-area-inset-top,0px)) 8px 8px;color:#fff;background:rgba(0,0,0,.6);z-index:2;}
 .viewer .vbar .icon{color:#fff;} .viewer .vbar .t{flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .viewer .stage{flex:1;overflow:hidden;position:relative;touch-action:none;}
-.viewer .stage > *{position:absolute;left:0;top:0;transform-origin:0 0;user-select:none;-webkit-user-select:none;}
+.viewer .stage > img,.viewer .stage > canvas{position:absolute;left:0;top:0;transform-origin:0 0;user-select:none;-webkit-user-select:none;}
 .viewer .stage canvas{background:#fff;}
+
+/* Galería de paneles */
+.viewer .vbar .nav{display:flex;gap:2px;}
+.viewer .cap{background:rgba(0,0,0,.72);color:#eee;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));font-size:14px;line-height:1.4;max-height:34%;overflow:auto;font-family:-apple-system,system-ui,sans-serif;z-index:2;}
+.viewer .cap b{color:#fff;background:rgba(255,228,92,.25);border-radius:2px;padding:0 2px;}
+.viewer .cap .lbl{display:inline-block;background:#FFE45C;color:#3B3200;font-weight:700;border-radius:6px;padding:0 7px;margin-right:6px;}
+.viewer .arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(0,0,0,.35);border-radius:10px;z-index:3;}
+.viewer .arrow.l{left:6px;} .viewer .arrow.r{right:6px;}
+.viewer .arrow[disabled]{opacity:.25;}
+.viewer .arrow svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.viewer .hint{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:rgba(0,0,0,.7);color:#fff;padding:8px 14px;border-radius:10px;font-size:13.5px;z-index:4;white-space:nowrap;font-family:-apple-system,system-ui,sans-serif;display:flex;gap:8px;align-items:center;}
+.viewer .hint svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
 
 /* ---------- Sheets & toast ---------- */
 .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50;display:flex;align-items:flex-end;justify-content:center;}
@@ -173,6 +202,7 @@ article ::selection{background:rgba(31,111,99,.3);}
       <button id="importBtn" class="primary">Importar PDF</button>
       <input type="file" id="fileInput" accept="application/pdf,.pdf" multiple hidden>
     </header>
+    <div id="chips" class="chips"></div>
     <div id="docList" class="doclist"></div>
     <div id="emptyState" class="empty" hidden>
       <strong>Sin artículos todavía</strong>
@@ -188,6 +218,7 @@ article ::selection{background:rgba(31,111,99,.3);}
       <button id="backBtn" class="icon" aria-label="Volver a la biblioteca"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="doctitle" id="docTitle"></div>
       <button id="pageBtn" class="pill" aria-label="Página actual">p. <span id="pageNow">1</span>/<span id="pageTotal">–</span></button>
+      <button id="themeBtn" class="icon" aria-label="Modo oscuro"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg></button>
       <button id="fontBtn" class="icon" aria-label="Texto"><svg viewBox="0 0 24 24"><path d="M4 18L10 5l6 13M6.5 13h7M17 11l2.5-5 2.5 5"/></svg></button>
       <button id="notesBtn" class="icon" aria-label="Subrayados y notas"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
       <button id="menuBtn" class="icon" aria-label="Más opciones"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg></button>
@@ -242,22 +273,26 @@ async function analyzePdf(pdf, opts = {}) {
       return { bold: BOLD_RE.test(name), italic: ITALIC_RE.test(name) };
     };
     const items = collectItems(tc, fontInfo, W, H);
+    // solo las figuras con entidad gráfica propia absorben texto cercano (evita que un logo se trague el bloque de autores)
+    for (const f of figures) f.absorb = (f.x1 - f.x0) * (f.y1 - f.y0) >= 0.05 * W * H;
     // texto dentro de una figura (etiquetas de ejes, etc.) no va al flujo; amplía la figura para abarcarlo
     for (const it of items) {
-      const f = figures.find(f => it.cx >= f.x0 - 2 && it.cx <= f.x1 + 2 && it.cy >= f.y0 - 2 && it.cy <= f.y1 + 2);
-      if (f) { it.inFig = true; f.x0 = Math.min(f.x0, it.x0); f.x1 = Math.max(f.x1, it.x1); f.y0 = Math.min(f.y0, it.y0); f.y1 = Math.max(f.y1, it.y1); }
+      const f = figures.find(f => f.absorb && it.cx >= f.x0 - 2 && it.cx <= f.x1 + 2 && it.cy >= f.y0 - 2 && it.cy <= f.y1 + 2);
+      if (f) { it.inFig = f; f.x0 = Math.min(f.x0, it.x0); f.x1 = Math.max(f.x1, it.x1); f.y0 = Math.min(f.y0, it.y0); f.y1 = Math.max(f.y1, it.y1); }
     }
     // etiquetas justo encima/debajo/al lado de una figura (títulos de panel) también pertenecen a ella
     for (let pass = 0; pass < 2; pass++) for (const it of items) {
       if (it.inFig || it.size > 11.5) continue;
       const f = figures.find(f => {
+        if (!f.absorb) return false;
         const ov = Math.min(it.x1, f.x1) - Math.max(it.x0, f.x0);
         const nearV = it.y0 >= f.y0 - 14 && it.y1 <= f.y1 + 14;        // justo encima o debajo, con solape horizontal
-        const nearH = it.y0 >= f.y0 - 2 && it.y1 <= f.y1 + 2 && (it.x1 >= f.x0 - 24 && it.x0 <= f.x1 + 24); // a un lado
+        const nearH = it.y0 >= f.y0 - 2 && it.y1 <= f.y1 + 2 && (it.x1 >= f.x0 - 8 && it.x0 <= f.x1 + 8) && (it.x1 - it.x0) < (f.x1 - f.x0) * 0.5; // etiqueta corta pegada a un lado
         return (nearV && ov >= (it.x1 - it.x0) * 0.3) || nearH;
       });
-      if (f && !CAPTION_RE.test(it.str)) { it.inFig = true; f.x0 = Math.min(f.x0, it.x0); f.x1 = Math.max(f.x1, it.x1); f.y0 = Math.min(f.y0, it.y0); f.y1 = Math.max(f.y1, it.y1); }
+      if (f && !CAPTION_RE.test(it.str)) { it.inFig = f; f.x0 = Math.min(f.x0, it.x0); f.x1 = Math.max(f.x1, it.x1); f.y0 = Math.min(f.y0, it.y0); f.y1 = Math.max(f.y1, it.y1); }
     }
+    for (const f of figures) f.panels = detectPanels(f, items);
     const lines = buildLines(items.filter(it => !it.inFig));
     pages.push({ p, W, H, lines, figures, page });
     onProgress?.(p / n * 0.6, `Analizando página ${p} de ${n}`);
@@ -272,14 +307,17 @@ async function analyzePdf(pdf, opts = {}) {
     const capSet = new Set();
     // un pie de figura incluye las líneas siguientes contiguas del mismo tamaño
     for (const c of captions) { capSet.add(c); let cur = c; for (;;) { const nx = nextLineBelow(pg.lines, cur); if (!nx || capSet.has(nx) || Math.abs(nx.size - cur.size) > 0.6 || (cur.y0 - nx.y1) > cur.size * 0.9 || CAPTION_RE.test(nx.text)) break; capSet.add(nx); cur = nx; } }
-    const flow = pg.lines.filter(l => !capSet.has(l));
+    const capParas0 = groupCaptions([...capSet], pg, body);
+    const textTables = detectTextTables(pg, capParas0.filter(cp => !pg.figures.some(f => Math.min(cp.x1, f.x1) - Math.max(cp.x0, f.x0) > -20 && Math.min(Math.abs(cp.y1 - f.y0), Math.abs(cp.y0 - f.y1)) < body * 6)), body);
+    pg.figures.push(...textTables);
+    const flow = pg.lines.filter(l => !capSet.has(l) && !l.used);
     const leaves = xyCut(flow, body);
     const paras = [];
     for (const leaf of leaves) paras.push(...linesToParagraphs(leaf, body, pg.p));
     // pies de figura → párrafos aparte, asociados a la figura más cercana
     const capParas = groupCaptions([...capSet], pg, body);
     pg.figures = pg.figures.filter(f => (f.x1 - f.x0) * (f.y1 - f.y0) >= 0.08 * pg.W * pg.H || capParas.some(cp => Math.min(cp.x1, f.x1) - Math.max(cp.x0, f.x0) > -20 && Math.min(Math.abs(cp.y1 - f.y0), Math.abs(cp.y0 - f.y1)) < body * 6));
-    const figBlocks = pg.figures.map(f => ({ type: "fig", page: pg.p, rect: [f.x0, f.y0, f.x1, f.y1], caption: null, x0: f.x0, x1: f.x1, y0: f.y0, y1: f.y1 }));
+    const figBlocks = pg.figures.map(f => ({ type: "fig", page: pg.p, rect: [f.x0, f.y0, f.x1, f.y1], caption: null, x0: f.x0, x1: f.x1, y0: f.y0, y1: f.y1, kind: f.kind || "figure", panels: f.panels || null }));
     for (const cp of capParas) {
       let best = null, bd = 1e9;
       for (const fb of figBlocks) {
@@ -288,7 +326,7 @@ async function analyzePdf(pdf, opts = {}) {
         const d = Math.min(Math.abs(cp.y1 - fb.y0), Math.abs(cp.y0 - fb.y1)); // distancia vertical
         if (d < bd) { bd = d; best = fb; }
       }
-      if (best && bd < body * 6 && !best.caption) best.caption = cp; else { cp.type = "caption"; paras.push(cp); }
+      if (best && bd < body * 6 && !best.caption) { best.caption = cp; if (/^(table|tabla)/i.test(cp.text)) best.kind = "table"; } else { cp.type = "caption"; paras.push(cp); }
     }
     // inserta cada figura antes del primer párrafo que quede por debajo de ella (misma zona horizontal)
     const ordered = [];
@@ -313,6 +351,18 @@ async function analyzePdf(pdf, opts = {}) {
   mergeContinuations(blocks);
   classify(blocks, body, pages);
 
+  // figuras compuestas sin etiquetas de texto (letras "quemadas" en la imagen): si el pie enumera (A)…(N), buscar huecos blancos en la imagen
+  if (opts.findPanelsInImage) {
+    for (const b of blocks) {
+      if (b.type !== "fig" || b.kind === "table" || !b.caption) continue;
+      const n = countCaptionMarkers(b.caption.text); if (n < 2 || (b.panels && b.panels.length >= n)) continue;
+      try {
+        const rects = await opts.findPanelsInImage(pages[b.page - 1].page, b.rect, n);
+        if (rects && rects.length >= 2 && rects.length > (b.panels?.length || 0)) b.panels = rects.map((r, i) => ({ label: String.fromCharCode(65 + i), rect: r }));
+      } catch (e) { console.warn(e); }
+    }
+  }
+
   // --- recortes de figuras ---
   if (renderCrop) {
     const byPage = new Map();
@@ -321,8 +371,11 @@ async function analyzePdf(pdf, opts = {}) {
     for (const [p, figs] of byPage) {
       const pg = pages[p - 1];
       const rects = figs.map(f => { const pad = 3; return [Math.max(0, f.rect[0] - pad), Math.max(0, f.rect[1] - pad), Math.min(pg.W, f.rect[2] + pad), Math.min(pg.H, f.rect[3] + pad)]; });
-      const imgs = await renderCrop(pg.page, rects);
+      const panelRects = []; const owners = [];
+      for (const f of figs) if (f.panels && f.kind !== "table") for (const pn of f.panels) { panelRects.push([Math.max(0, pn.rect[0] - 2), Math.max(0, pn.rect[1] - 2), Math.min(pg.W, pn.rect[2] + 2), Math.min(pg.H, pn.rect[3] + 2)]); owners.push(pn); }
+      const imgs = await renderCrop(pg.page, [...rects, ...panelRects]);
       figs.forEach((f, i) => { f.img = imgs[i]; });
+      owners.forEach((pn, i) => { pn.img = imgs[rects.length + i]; });
       done++; onProgress?.(0.8 + 0.2 * done / byPage.size, `Recortando figuras (${done}/${byPage.size})`);
     }
   }
@@ -332,7 +385,15 @@ async function analyzePdf(pdf, opts = {}) {
     pages: n, bodySize: body,
     blocks: blocks.map(b => {
       const out = { id: "b" + (id++), type: b.type, page: b.page };
-      if (b.type === "fig") { out.rect = b.rect.map(v => Math.round(v * 10) / 10); out.img = b.img || null; if (b.caption) { out.caption = b.caption.text; out.captionRuns = b.caption.runs; out.captionSpans = b.caption.spans; } }
+      if (b.type === "fig") {
+        out.rect = b.rect.map(v => Math.round(v * 10) / 10); out.img = b.img || null; out.kind = b.kind || "figure";
+        if (b.caption) { out.caption = b.caption.text; out.captionRuns = b.caption.runs; out.captionSpans = b.caption.spans; }
+        if (b.panels && b.kind !== "table") {
+          const split = splitCaption(b.caption?.text, b.panels.map(p => p.label));
+          out.panels = b.panels.map((p, i) => ({ label: p.label, rect: p.rect.map(v => Math.round(v * 10) / 10), img: p.img || null, caption: split ? split.per[p.label] : null }));
+          if (split) out.captionCommon = split.common;
+        }
+      }
       else { out.text = b.text; out.runs = b.runs; out.spans = b.spans; }
       return out;
     }),
@@ -375,24 +436,122 @@ function findFigures(ol, OPS, W, H) {
       case OPS.endPath: case OPS.clip: case OPS.eoClip: pendingPath = null; break;
     }
   }
-  // agrupa rectángulos que se tocan o solapan
+  // agrupa rectángulos que se tocan o solapan → componentes; luego componentes lado a lado → figura con paneles
   const GAP = 10;
-  let clusters = rects.map(r => ({ ...r, n: 1, imgs: r.kind === "img" ? 1 : 0 }));
   const near = (a, b, g) => a.x0 <= b.x1 + g && b.x0 <= a.x1 + g && a.y0 <= b.y1 + g && b.y0 <= a.y1 + g;
-  // paneles de una misma figura: lado a lado con gran solape vertical
-  const panels = (a, b) => { const ov = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0); const hmin = Math.min(a.y1 - a.y0, b.y1 - b.y0); return ov > 0.7 * hmin && hmin > 40 && (a.x0 <= b.x1 + 40 && b.x0 <= a.x1 + 40); };
-  let merged = true;
-  while (merged) {
-    merged = false;
-    outer: for (let i = 0; i < clusters.length; i++) for (let j = i + 1; j < clusters.length; j++) {
-      const a = clusters[i], b = clusters[j];
-      if (near(a, b, GAP) || (big(a) && big(b) && panels(a, b))) {
-        clusters[i] = { x0: Math.min(a.x0, b.x0), y0: Math.min(a.y0, b.y0), x1: Math.max(a.x1, b.x1), y1: Math.max(a.y1, b.y1), n: a.n + b.n, imgs: a.imgs + b.imgs };
-        clusters.splice(j, 1); merged = true; break outer;
+  const union = (a, b) => ({ x0: Math.min(a.x0, b.x0), y0: Math.min(a.y0, b.y0), x1: Math.max(a.x1, b.x1), y1: Math.max(a.y1, b.y1), n: a.n + b.n, imgs: a.imgs + b.imgs, parts: [...(a.parts || [a]), ...(b.parts || [b])] });
+  const mergeAll = (list, test) => {
+    let merged = true;
+    while (merged) {
+      merged = false;
+      outer: for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
+        if (test(list[i], list[j])) { list[i] = union(list[i], list[j]); list.splice(j, 1); merged = true; break outer; }
+      }
+    }
+    return list;
+  };
+  let parts = mergeAll(rects.map(r => ({ ...r, n: 1, imgs: r.kind === "img" ? 1 : 0 })), (a, b) => near(a, b, GAP));
+  parts = parts.map(c => ({ x0: c.x0, y0: c.y0, x1: c.x1, y1: c.y1, n: c.n, imgs: c.imgs }));
+  // paneles de una misma figura: lado a lado (o uno sobre otro) con gran solape y poca distancia
+  const sideBySide = (a, b) => { const ov = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0); const hmin = Math.min(a.y1 - a.y0, b.y1 - b.y0); return ov > 0.6 * hmin && hmin > 40 && a.x0 <= b.x1 + 40 && b.x0 <= a.x1 + 40; };
+  const stacked = (a, b) => { const ov = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0); const wmin = Math.min(a.x1 - a.x0, b.x1 - b.x0); return ov > 0.6 * wmin && wmin > 50 && a.y0 <= b.y1 + 30 && b.y0 <= a.y1 + 30; };
+  const figures = mergeAll(parts.map(c => ({ ...c, parts: [c] })), (a, b) => big(a) && big(b) && (sideBySide(a, b) || stacked(a, b)));
+  return figures.filter(c => { const w = c.x1 - c.x0, h = c.y1 - c.y0; return w >= 50 && h >= 30 && w * h >= 3000 && (c.imgs > 0 || c.n >= 4); });
+}
+
+/* ---------- 1b. Paneles (A, B, C…) dentro de una figura ---------- */
+function detectPanels(f, items) {
+  const inside = items.filter(it => it.inFig === f);
+  // etiquetas: una sola letra (A, B, (C), d…) dentro de la figura, no demasiado grande
+  const labels = [];
+  for (const it of inside) {
+    const m = it.str.trim().match(/^\(?([A-Ha-h])\)?\.?$/); if (!m || it.size > 16) continue;
+    const L = m[1].toUpperCase(); if (labels.some(l => l.L === L)) continue;
+    labels.push({ L, x: it.x0, y: it.y1, h: it.size });
+  }
+  labels.sort((a, b) => a.L.charCodeAt(0) - b.L.charCodeAt(0));
+  const seq = labels.every((l, i) => l.L.charCodeAt(0) === 65 + i);
+  if (labels.length >= 2 && seq) {
+    // rejilla a partir de las posiciones de las etiquetas (suelen estar en la esquina superior izquierda de cada panel)
+    const cluster = (vals, tol) => { const out = []; for (const v of [...vals].sort((a, b) => a - b)) { const g = out[out.length - 1]; if (g && v - g[g.length - 1] <= tol) g.push(v); else out.push([v]); } return out.map(g => g[0]); };
+    const cols = cluster(labels.map(l => l.x), 25), rows = cluster(labels.map(l => l.y), 25).sort((a, b) => b - a);
+    const panels = labels.map(l => {
+      const ci = cols.findIndex((c, i) => l.x >= c - 25 && (i === cols.length - 1 || l.x < cols[i + 1] - 25)); const ri = rows.findIndex((r, i) => l.y <= r + 25 && (i === rows.length - 1 || l.y > rows[i + 1] + 25));
+      const x0 = Math.max(f.x0, (ci <= 0 ? f.x0 : cols[ci] - 4)), x1 = ci >= cols.length - 1 ? f.x1 : Math.min(f.x1, cols[ci + 1] - 4);
+      const y1 = Math.min(f.y1, ri <= 0 ? f.y1 : rows[ri] + l.h + 4), y0 = ri >= rows.length - 1 ? f.y0 : Math.max(f.y0, rows[ri + 1] + l.h + 4);
+      return { label: l.L, rect: [x0, y0, x1, y1] };
+    });
+    if (panels.every(p => p.rect[2] - p.rect[0] > 30 && p.rect[3] - p.rect[1] > 30)) return panels;
+  }
+  // sin etiquetas: componentes grandes separados (viñetas sin letra)
+  const bigParts = (f.parts || []).filter(p => (p.x1 - p.x0) * (p.y1 - p.y0) >= 0.12 * (f.x1 - f.x0) * (f.y1 - f.y0) && (p.x1 - p.x0) > 40 && (p.y1 - p.y0) > 40);
+  if (bigParts.length >= 2 && bigParts.length <= 12) {
+    bigParts.sort((a, b) => (Math.abs(a.y1 - b.y1) > 20 ? b.y1 - a.y1 : a.x0 - b.x0));
+    return bigParts.map((p, i) => ({ label: String(i + 1), rect: [p.x0, p.y0, p.x1, p.y1] }));
+  }
+  return null;
+}
+function captionTokens(text) {
+  // marcadores: "(A)", "(B, C)", "(A-C)", "(A & B)", "(A and B)" o "A," / "A:" al inicio de una frase
+  const re = /\(\s*([A-H](?:\s*(?:,|&|–|-|and|y|to)\s*[A-H])*)\s*\)|(?:^|[.;:]\s+)([A-H])(?=[,:.)]\s)/g;
+  const toks = []; let m;
+  while ((m = re.exec(text))) {
+    const body = m[1] || m[2]; const letters = [];
+    const parts = body.split(/\s*(?:,|&|and|y)\s*/);
+    for (const pt of parts) { const r = pt.match(/^([A-H])\s*(?:–|-|to)\s*([A-H])$/); if (r) { for (let c = r[1].charCodeAt(0); c <= r[2].charCodeAt(0); c++) letters.push(String.fromCharCode(c)); } else if (/^[A-H]$/.test(pt.trim())) letters.push(pt.trim()); }
+    if (!letters.length) continue;
+    const start = m[2] ? m.index + m[0].lastIndexOf(m[2]) : m.index;
+    toks.push({ letters, start, end: m.index + m[0].length });
+  }
+  return toks;
+}
+function countCaptionMarkers(text) {
+  if (!text) return 0;
+  const covered = new Set(); for (const t of captionTokens(text)) for (const L of t.letters) covered.add(L);
+  let n = 0; while (covered.has(String.fromCharCode(65 + n))) n++;
+  return n >= 2 ? n : 0;
+}
+/* Reparte el pie de figura entre paneles */
+function splitCaption(text, labels) {
+  if (!text || !labels || labels.length < 2 || !/^[A-H]$/.test(labels[0])) return null;
+  const toks = captionTokens(text); if (!toks.length) return null;
+  const per = {};
+  toks.forEach((t, i) => {
+    const seg = text.slice(t.end, i + 1 < toks.length ? toks[i + 1].start : undefined).trim().replace(/^[\s,:.;–-]+/, "").replace(/[;,]\s*$/, "");
+    for (const L of t.letters) per[L] = per[L] ? per[L] + " · " + seg : seg;
+  });
+  const hit = labels.filter(L => per[L] != null).length;
+  if (hit < Math.max(2, labels.length - 1)) return null;
+  return { common: text.slice(0, toks[0].start).trim(), per };
+}
+/* Tablas sin filetes: región de líneas "tabulares" junto a un pie "Table N" que no tiene figura asociada */
+function detectTextTables(pg, capParas, body) {
+  const out = [];
+  const tabular = l => { if (l.items.length >= 3) { let big = 0; for (let i = 1; i < l.items.length; i++) if (l.items[i].x0 - l.items[i - 1].x1 > 1.2 * l.size) big++; if (big >= 2) return true; } return false; };
+  for (const cp of capParas) {
+    if (!/^(table|tabla)/i.test(cp.text)) continue;
+    const span = [cp.x0, cp.x1];
+    for (const dir of [-1, 1]) {   // -1: líneas por debajo del pie; +1: por encima
+      const cand = pg.lines.filter(l => !l.used && !capParas.some(c => c.lines.includes(l)) && Math.min(l.x1, span[1] + 40) - Math.max(l.x0, span[0] - 40) > 20 && (dir < 0 ? l.y1 <= cp.y0 + 2 : l.y0 >= cp.y1 - 2))
+        .sort((a, b) => dir < 0 ? b.base - a.base : a.base - b.base);
+      const taken = []; let prev = cp, nTab = 0;
+      for (const l of cand) {
+        const gap = dir < 0 ? prev.y0 - l.y1 : l.y0 - prev.y1;
+        if (gap > body * 2.2) break;
+        const isTab = tabular(l), small = l.size < body * 0.95, short = (l.x1 - l.x0) < (span[1] - span[0]) * 0.75;
+        if (!isTab && !small && !short) break;                     // vuelve la prosa
+        if (!isTab && !short && nTab === 0) break;
+        taken.push(l); if (isTab) nTab++; prev = l;
+      }
+      if (nTab >= 2) {
+        for (const l of taken) l.used = true;
+        const rect = [Math.min(cp.x0, ...taken.map(l => l.x0)) - 2, Math.min(cp.y0, ...taken.map(l => l.y0)) - 2, Math.max(cp.x1, ...taken.map(l => l.x1)) + 2, Math.max(cp.y1, ...taken.map(l => l.y1)) + 2];
+        out.push({ x0: rect[0], y0: rect[1], x1: rect[2], y1: rect[3], n: 0, imgs: 0, parts: [], kind: "table", cap: cp });
+        break;
       }
     }
   }
-  return clusters.filter(c => { const w = c.x1 - c.x0, h = c.y1 - c.y0; return w >= 50 && h >= 30 && w * h >= 3000 && (c.imgs > 0 || c.n >= 4); });
+  return out;
 }
 
 /* ---------- 2. Ítems de texto ---------- */
@@ -616,12 +775,13 @@ const AUTHOR = "Rodri";
 const COLORS = { yellow: [1, 0.89, 0.36], green: [0.62, 0.89, 0.61], blue: [0.61, 0.80, 1], pink: [1, 0.70, 0.78] };
 const SW = { yellow: "#FFE45C", green: "#9EE39B", blue: "#9CCBFF", pink: "#FFB3C7" };
 let lastColor = "yellow";
+const DEFAULT_PREFS = { fs: 18, lh: 1.55, sans: false, theme: "auto" };
 const prefs = loadPrefs();
 
 /* ---------------- Almacenamiento (IndexedDB) ---------------- */
 const dbp = new Promise((res, rej) => {
-  const r = indexedDB.open("lector", 2);
-  r.onupgradeneeded = () => { const db = r.result; for (const s of ["files", "reflow", "images"]) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s); if (!db.objectStoreNames.contains("meta")) db.createObjectStore("meta", { keyPath: "id" }); };
+  const r = indexedDB.open("lector", 3);
+  r.onupgradeneeded = () => { const db = r.result; for (const s of ["files", "reflow", "images"]) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s); for (const s of ["meta", "lists"]) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath: "id" }); };
   r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
 });
 async function store(name, mode, fn) {
@@ -638,11 +798,21 @@ const DB = {
   putReflow: (id, r) => store("reflow", "readwrite", s => s.put(r, id)),
   getImage: k => store("images", "readonly", s => s.get(k)),
   putImage: (k, b) => store("images", "readwrite", s => s.put(b, k)),
+  lists: () => store("lists", "readonly", s => s.getAll()),
+  putList: l => store("lists", "readwrite", s => s.put(l)),
+  delList: id => store("lists", "readwrite", s => s.delete(id)),
   del: async id => { for (const s of ["meta", "files", "reflow"]) await store(s, "readwrite", st => st.delete(id)); await store("images", "readwrite", st => st.delete(IDBKeyRange.bound(id + "/", id + "/￿"))); },
 };
-function loadPrefs() { try { return Object.assign({ fs: 18, lh: 1.55, sans: false }, JSON.parse(localStorage.getItem("lector-prefs") || "{}")); } catch { return { fs: 18, lh: 1.55, sans: false }; } }
+function loadPrefs() { try { return Object.assign({ ...DEFAULT_PREFS }, JSON.parse(localStorage.getItem("lector-prefs") || "{}")); } catch { return { ...DEFAULT_PREFS }; } }
 function savePrefs() { try { localStorage.setItem("lector-prefs", JSON.stringify(prefs)); } catch {} applyPrefs(); }
-function applyPrefs() { document.documentElement.style.setProperty("--fs", prefs.fs + "px"); document.documentElement.style.setProperty("--lh", prefs.lh); $("#art").classList.toggle("sans", !!prefs.sans); }
+function applyPrefs() {
+  const root = document.documentElement;
+  root.style.setProperty("--fs", prefs.fs + "px"); root.style.setProperty("--lh", prefs.lh); $("#art").classList.toggle("sans", !!prefs.sans);
+  // tema: auto sigue al sistema; claro/oscuro fuerzan la paleta (los tokens CSS responden a data-theme)
+  if (prefs.theme === "auto") root.removeAttribute("data-theme"); else root.dataset.theme = prefs.theme;
+  const dark = prefs.theme === "dark" || (prefs.theme === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#141517" : "#F6F5F1");
+}
 
 /* ---------------- Utilidades UI ---------------- */
 let toastT;
@@ -670,17 +840,33 @@ const ICON = {
   trash: '<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
   open: '<svg viewBox="0 0 24 24"><path d="M5 4h9l5 5v11H5zM14 4v5h5"/></svg>',
   note: '<svg viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4z"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg>',
+  list: '<svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>',
 };
 
 /* ---------------- Biblioteca ---------------- */
+const LIB = { filter: "all" };   // "all" | "unread" | id de lista
+try { LIB.filter = localStorage.getItem("lector-filter") || "all"; } catch {}
 async function renderLibrary() {
-  const docs = (await DB.list()).sort((a, b) => (b.opened || b.added) - (a.opened || a.added));
+  const all = (await DB.list()).sort((a, b) => (b.opened || b.added) - (a.opened || a.added));
+  const lists = (await DB.lists()).sort((a, b) => a.created - b.created);
+  if (LIB.filter !== "all" && LIB.filter !== "unread" && !lists.some(l => l.id === LIB.filter)) LIB.filter = "all";
+  const unread = all.filter(d => d.status !== "read");
+  const docs = LIB.filter === "all" ? all : LIB.filter === "unread" ? unread : all.filter(d => (d.lists || []).includes(LIB.filter));
+  // chips de listas
+  const chips = $("#chips"); chips.replaceChildren();
+  const mk = (id, label, count) => { const c = document.createElement("button"); c.className = "chip" + (LIB.filter === id ? " on" : ""); c.dataset.id = id; c.innerHTML = `${esc(label)} <span class="cnt">${count}</span>`; c.addEventListener("click", () => { if (LIB.filter === id && id !== "all" && id !== "unread") listMenu(lists.find(l => l.id === id)); else { LIB.filter = id; try { localStorage.setItem("lector-filter", id); } catch {} renderLibrary(); } }); return c; };
+  chips.appendChild(mk("all", "Todos", all.length)); chips.appendChild(mk("unread", "Por leer", unread.length));
+  for (const l of lists) chips.appendChild(mk(l.id, l.name, all.filter(d => (d.lists || []).includes(l.id)).length));
+  const add = document.createElement("button"); add.className = "chip add"; add.textContent = "+ Lista"; add.addEventListener("click", () => newListSheet()); chips.appendChild(add);
+  chips.hidden = all.length === 0;
   const list = $("#docList"); list.replaceChildren();
-  $("#emptyState").hidden = docs.length > 0;
+  $("#emptyState").hidden = all.length > 0;
+  if (all.length && !docs.length) { const e = document.createElement("div"); e.className = "empty"; e.innerHTML = LIB.filter === "unread" ? "<strong>Todo leído</strong><p>No queda nada por leer.</p>" : "<strong>Lista vacía</strong><p>Añade artículos desde el menú ··· de cada uno.</p>"; list.appendChild(e); }
   for (const d of docs) {
     const nH = d.annots.filter(a => a.e > a.s).length, nN = d.annots.filter(a => a.note).length;
-    const el = document.createElement("div"); el.className = "doc"; el.setAttribute("role", "button"); el.tabIndex = 0;
-    el.innerHTML = `<div class="thumb"><i></i><i></i><i></i><i></i>${nH ? "<b></b>" : ""}</div>
+    const el = document.createElement("div"); el.className = "doc" + (d.status === "read" ? " read" : ""); el.setAttribute("role", "button"); el.tabIndex = 0;
+    el.innerHTML = `<span class="status" title="Por leer"></span><div class="thumb"><i></i><i></i><i></i><i></i>${nH ? "<b></b>" : ""}</div>
       <div class="info"><div class="name">${esc(d.name)}</div>
       <div class="meta">${d.pages} pág · ${nH} subrayados · ${nN} notas · ${fmtDate(d.opened || d.added)}</div></div>
       <button class="more" aria-label="Opciones de ${esc(d.name)}"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>`;
@@ -689,9 +875,45 @@ async function renderLibrary() {
     list.appendChild(el);
   }
 }
+function newListSheet(then) {
+  const sh = openSheet(`<h2>Nueva lista</h2><input id="listIn" placeholder="p. ej. Y-90, Guardia, Tesis…"><div class="row"><button class="ghost" data-a="cancel">Cancelar</button><button class="primary" data-a="ok">Crear</button></div>`);
+  const inp = $("#listIn", sh); inp.focus();
+  const ok = async () => { const name = inp.value.trim(); if (!name) return; const l = { id: uid(), name, created: Date.now() }; await DB.putList(l); closeSheet(); if (then) then(l); else { LIB.filter = l.id; renderLibrary(); } };
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") ok(); });
+  sh.addEventListener("click", e => { const a = e.target.closest("[data-a]")?.dataset.a; if (a === "ok") ok(); else if (a === "cancel") closeSheet(); });
+}
+function listMenu(l) {
+  if (!l) return;
+  const sh = openSheet(`<h2>${esc(l.name)}</h2>
+    <button class="item" data-a="rename">${ICON.rename} Renombrar lista</button>
+    <button class="item danger" data-a="del">${ICON.trash} Eliminar lista <small>los artículos no se borran</small></button>`);
+  sh.addEventListener("click", async e => {
+    const a = e.target.closest("[data-a]")?.dataset.a; if (!a) return;
+    if (a === "rename") {
+      const sh2 = openSheet(`<h2>Renombrar lista</h2><input id="listIn" value="${esc(l.name)}"><div class="row"><button class="ghost" data-a="cancel">Cancelar</button><button class="primary" data-a="ok">Guardar</button></div>`);
+      $("#listIn", sh2).focus();
+      sh2.addEventListener("click", async ev => { const b = ev.target.closest("[data-a]")?.dataset.a; if (!b) return; if (b === "ok") { l.name = $("#listIn", sh2).value.trim() || l.name; await DB.putList(l); } closeSheet(); renderLibrary(); });
+    }
+    if (a === "del") { await DB.delList(l.id); for (const d of await DB.list()) if ((d.lists || []).includes(l.id)) { d.lists = d.lists.filter(x => x !== l.id); await DB.putMeta(d); } LIB.filter = "all"; closeSheet(); renderLibrary(); }
+  });
+}
+async function addToListsSheet(d) {
+  const lists = (await DB.lists()).sort((a, b) => a.created - b.created);
+  const render = () => `<h2>Listas de «${esc(d.name.slice(0, 40))}»</h2>
+    ${lists.map(l => `<button class="check ${(d.lists || []).includes(l.id) ? "on" : ""}" data-id="${l.id}"><span class="box">${(d.lists || []).includes(l.id) ? "✓" : ""}</span>${esc(l.name)}</button>`).join("")}
+    <button class="item" data-a="new" style="color:var(--accent)">+ Nueva lista</button>`;
+  const sh = openSheet(render());
+  sh.addEventListener("click", async e => {
+    const c = e.target.closest(".check");
+    if (c) { d.lists = d.lists || []; const id = c.dataset.id; d.lists = d.lists.includes(id) ? d.lists.filter(x => x !== id) : [...d.lists, id]; await DB.putMeta(d); sh.innerHTML = `<div class="grab"></div>` + render(); renderLibrary(); return; }
+    if (e.target.closest('[data-a="new"]')) newListSheet(async l => { d.lists = [...(d.lists || []), l.id]; await DB.putMeta(d); renderLibrary(); addToListsSheet(d); });
+  });
+}
 function docMenu(d) {
   const sh = openSheet(`<h2>${esc(d.name)}</h2>
     <button class="item" data-a="open">${ICON.open} Abrir</button>
+    <button class="item" data-a="read">${ICON.check} ${d.status === "read" ? "Marcar como por leer" : "Marcar como leído"}</button>
+    <button class="item" data-a="lists">${ICON.list} Listas…</button>
     <button class="item" data-a="pdf">${ICON.share} Compartir PDF anotado</button>
     <button class="item" data-a="md">${ICON.md} Compartir apuntes (Markdown)</button>
     <button class="item" data-a="rename">${ICON.rename} Renombrar</button>
@@ -699,6 +921,8 @@ function docMenu(d) {
   sh.addEventListener("click", async e => {
     const a = e.target.closest("[data-a]")?.dataset.a; if (!a) return;
     if (a === "open") { closeSheet(); openDoc(d.id); }
+    if (a === "read") { d.status = d.status === "read" ? "unread" : "read"; await DB.putMeta(d); closeSheet(); renderLibrary(); }
+    if (a === "lists") addToListsSheet(d);
     if (a === "pdf") { closeSheet(); await exportPdf(d); }
     if (a === "md") { closeSheet(); await exportMd(d); }
     if (a === "rename") renameDoc(d);
@@ -726,12 +950,15 @@ async function importFiles(files) {
       const buf = await f.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
       const id = uid();
-      const reflow = await analyzePdf(pdf, { OPS: pdfjsLib.OPS, onProgress: (fr, t) => progress(fr, t), renderCrop });
+      const reflow = await analyzePdf(pdf, { OPS: pdfjsLib.OPS, onProgress: (fr, t) => progress(fr, t), renderCrop, findPanelsInImage });
       const images = [];
-      for (const b of reflow.blocks) if (b.type === "fig" && b.img) { images.push([`${id}/${b.id}`, b.img]); b.img = true; }
+      for (const b of reflow.blocks) if (b.type === "fig") {
+        if (b.img) { images.push([`${id}/${b.id}`, b.img]); b.img = true; }
+        if (b.panels) b.panels.forEach((pn, i) => { if (pn.img) { images.push([`${id}/${b.id}/p${i}`, pn.img]); pn.img = true; } });
+      }
       let name = f.name.replace(/\.pdf$/i, "");
       const t = reflow.blocks.find(b => b.type === "title"); if (t && t.text.length > 8 && t.text.length < 160) name = t.text;
-      const meta = { id, name, file: f.name, pages: pdf.numPages, size: buf.byteLength, added: Date.now(), opened: 0, pos: null, annots: [] };
+      const meta = { id, name, file: f.name, pages: pdf.numPages, size: buf.byteLength, added: Date.now(), opened: 0, pos: null, annots: [], status: "unread", lists: [] };
       progress(0.98, "Leyendo subrayados previos…");
       meta.annots = await importExistingAnnots(pdf, reflow);
       pdf.destroy();
@@ -768,6 +995,44 @@ async function renderCrop(page, rects) {
   }
   cropCanvas.width = 0; cropCanvas.height = 0;
   return out;
+}
+
+/* Divide una figura compuesta por sus huecos blancos (filas y luego columnas). Devuelve n rectángulos PDF o null */
+async function findPanelsInImage(page, rect, n) {
+  const base = page.getViewport({ scale: 1 }); const scale = 1.5; const vp = page.getViewport({ scale });
+  const [a, b, c, d] = vp.convertToViewportRectangle(rect); const x = Math.floor(Math.min(a, c)), y = Math.floor(Math.min(b, d)), w = Math.ceil(Math.abs(c - a)), h = Math.ceil(Math.abs(d - b));
+  if (w < 40 || h < 40) return null;
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = h; const ctx = cv.getContext("2d", { alpha: false });
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h);
+  await page.render({ canvasContext: ctx, viewport: vp, transform: [1, 0, 0, 1, -x, -y] }).promise;
+  const data = ctx.getImageData(0, 0, w, h).data;
+  const white = i => data[i] > 238 && data[i + 1] > 238 && data[i + 2] > 238;
+  // perfiles: fracción de píxeles blancos por fila y por columna dentro de una región
+  const cut = (rx, ry, rw, rh, axis) => {
+    const len = axis === "row" ? rh : rw, other = axis === "row" ? rw : rh;
+    // por cada fila/columna: fracción de blanco y racha no blanca más larga (una letra de panel en el hueco es corta)
+    const isGap = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      let cnt = 0, run = 0, maxRun = 0;
+      for (let j = 0; j < other; j++) { const px = axis === "row" ? rx + j : rx + i, py = axis === "row" ? ry + i : ry + j; if (white((py * w + px) * 4)) { cnt++; run = 0; } else { run++; if (run > maxRun) maxRun = run; } }
+      const frac = cnt / other; isGap[i] = frac >= 0.97 || (frac >= 0.78 && maxRun <= other * 0.22) ? 1 : 0;
+    }
+    const gaps = []; const minGap = Math.max(3, Math.round(len * 0.01));
+    for (let i = 0; i < len;) { if (!isGap[i]) { i++; continue; } let e = i; while (e < len && isGap[e]) e++; if (e - i >= minGap && i > len * 0.06 && e < len * 0.94) gaps.push([i, e]); i = e; }
+    if (!gaps.length) return [[0, len]];
+    const segs = []; let s0 = 0; for (const [gs, ge] of gaps) { if (gs - s0 > len * 0.08) segs.push([s0, gs]); s0 = ge; } if (len - s0 > len * 0.08) segs.push([s0, len]);
+    return segs;
+  };
+  const cells = [];
+  for (const [ry0, ry1] of cut(0, 0, w, h, "row")) for (const [rx0, rx1] of cut(0, ry0, w, ry1 - ry0, "col")) cells.push([rx0, ry0, rx1, ry1]);
+  let result = cells;
+  const okCount = k => k >= 2 && k <= n + 2;
+  if (cells.length !== n) { // prueba el orden inverso (columnas y luego filas) y quédate con el recuento más cercano al del pie
+    const alt = []; for (const [rx0, rx1] of cut(0, 0, w, h, "col")) for (const [ry0, ry1] of cut(rx0, 0, rx1 - rx0, h, "row")) alt.push([rx0, ry0, rx1, ry1]);
+    if (okCount(alt.length) && (!okCount(cells.length) || Math.abs(alt.length - n) < Math.abs(cells.length - n))) result = alt.sort((p, q) => (Math.abs(p[1] - q[1]) > 10 ? p[1] - q[1] : p[0] - q[0]));
+  }
+  if (!okCount(result.length)) return null;
+  return result.map(([cx0, cy0, cx1, cy1]) => { const [px0, py0] = vp.convertToPdfPoint(x + cx0, y + cy0), [px1, py1] = vp.convertToPdfPoint(x + cx1, y + cy1); return [Math.min(px0, px1), Math.min(py0, py1), Math.max(px0, px1), Math.max(py0, py1)].map(v => Math.round(v * 10) / 10); });
 }
 
 /* Subrayados que ya traiga el PDF (de esta u otra app) → anotaciones sobre el texto líquido */
@@ -875,13 +1140,45 @@ function blockEl(b) {
   return wrap;
 }
 async function figureEl(b) {
-  const fig = document.createElement("figure"); fig.className = "blk fig"; fig.dataset.b = b.id;
-  let src = null;
-  if (b.img) { const blob = await DB.getImage(`${R.doc.id}/${b.id}`); if (blob) { src = URL.createObjectURL(blob); R.urls.push(src); } }
-  fig.innerHTML = `<div class="wrap">${src ? `<img class="fig" src="${src}" alt="Figura de la página ${b.page}"><span class="zoomhint">Ampliar</span>` : `<div class="fig nomatch">Figura de la página ${b.page} (ver página original)</div>`}</div>
+  const isTable = b.kind === "table";
+  const fig = document.createElement("figure"); fig.className = "blk fig" + (isTable ? " table" : ""); fig.dataset.b = b.id;
+  const src = await imgUrl(`${R.doc.id}/${b.id}`, b.img);
+  const label = isTable ? (b.caption?.match(/^(table|tabla)\s*S?\d+[A-Za-z]?/i)?.[0] || "Tabla") : (b.caption?.match(/^(fig(?:ure|\.)?|figura)\s*S?\d+[A-Za-z]?/i)?.[0] || "Figura");
+  const panels = !isTable && b.panels ? b.panels : null;
+  let strip = "";
+  if (panels) {
+    const urls = await Promise.all(panels.map((pn, i) => imgUrl(`${R.doc.id}/${b.id}/p${i}`, pn.img)));
+    strip = `<div class="panelstrip">${panels.map((pn, i) => `<button data-i="${i}" style="background-image:url('${urls[i] || ""}')" aria-label="Panel ${pn.label}"><b>${esc(pn.label)}</b></button>`).join("")}</div>`;
+  }
+  fig.innerHTML = `<div class="wrap">${src ? `<img class="fig" src="${src}" alt="${esc(label)} de la página ${b.page}"><span class="kind">${esc(label)}${panels ? " · " + panels.length + " paneles" : ""}</span><span class="zoomhint">${isTable ? "Abrir tabla" : "Ampliar"}</span>` : `<div class="fig nomatch">${esc(label)} de la página ${b.page} (ver página original)</div>`}</div>
+    ${strip}
     ${b.caption ? `<figcaption class="tx" data-b="${b.id}c">${textHtml({ text: b.caption, spans: b.captionSpans || [] }, b.id + "c")}</figcaption>` : ""}`;
-  $(".wrap", fig).addEventListener("click", () => src ? openViewer({ src, title: b.caption ? b.caption.slice(0, 60) : `Figura · p. ${b.page}` }) : openPageViewer(b.page));
+  $(".wrap", fig).addEventListener("click", () => src ? openFigure(b, -1) : openPageViewer(b.page));
+  fig.querySelectorAll(".panelstrip button").forEach(bt => bt.addEventListener("click", () => openFigure(b, +bt.dataset.i)));
   return fig;
+}
+async function imgUrl(key, has) {
+  if (!has) return null;
+  const blob = await DB.getImage(key); if (!blob) return null;
+  const u = URL.createObjectURL(blob); R.urls.push(u); return u;
+}
+/* Abre una figura en la galería: la figura completa y, si tiene paneles, cada panel con su parte del pie */
+async function openFigure(b, index) {
+  const isTable = b.kind === "table";
+  const items = [];
+  const full = await imgUrl(`${R.doc.id}/${b.id}`, b.img);
+  const kindLabel = isTable ? "Tabla" : "Figura";
+  const title = b.caption ? b.caption.slice(0, 70) : `${kindLabel} · p. ${b.page}`;
+  items.push({ src: full, title, caption: b.caption ? esc(b.caption) : "", table: isTable });
+  if (!isTable && b.panels) {
+    for (let i = 0; i < b.panels.length; i++) {
+      const pn = b.panels[i]; const src = await imgUrl(`${R.doc.id}/${b.id}/p${i}`, pn.img); if (!src) continue;
+      let cap = b.caption ? esc(b.caption) : "";
+      if (pn.caption && b.caption) { const k = b.caption.indexOf(pn.caption); if (k >= 0) cap = esc(b.caption.slice(0, k)) + "<b>" + esc(pn.caption) + "</b>" + esc(b.caption.slice(k + pn.caption.length)); }
+      items.push({ src, title: `${title}`, caption: `<span class="lbl">${esc(pn.label)}</span>` + cap, sub: `${pn.label} · ${i + 1}/${b.panels.length}` });
+    }
+  }
+  openGallery(items, index < 0 ? 0 : index + 1);
 }
 /* Texto de un bloque → HTML con negritas/cursivas/superíndices y subrayados, sin alterar los caracteres */
 function textHtml(b, bid) {
@@ -931,6 +1228,7 @@ function updatePage() {
     R.doc.pos = { block: cur.dataset.b, off: Math.max(0, scrollEl.scrollTop - cur.offsetTop + 8) }; saveDocSoon();
   }
   const max = scrollEl.scrollHeight - scrollEl.clientHeight; $("#rprog").style.width = (max > 0 ? Math.min(100, scrollEl.scrollTop / max * 100) : 0) + "%";
+  if (max > 0 && scrollEl.scrollTop / max > 0.92 && R.doc.status !== "read") { R.doc.status = "read"; saveDocSoon(); }
 }
 function saveDocSoon() { clearTimeout(R.saveT); R.saveT = setTimeout(() => R.doc && DB.putMeta(R.doc), 500); }
 function scrollToBlock(bid, flashId) {
@@ -1046,28 +1344,37 @@ $("#fontBtn").addEventListener("click", () => {
   const sh = openSheet(`<h2>Texto</h2>
     <div class="label">Tamaño</div><div class="seg"><button data-fs="-1">A−</button><button data-fs="+1">A+</button></div>
     <div class="label">Interlineado</div><div class="seg"><button data-lh="1.35" class="${prefs.lh == 1.35 ? "on" : ""}">Compacto</button><button data-lh="1.55" class="${prefs.lh == 1.55 ? "on" : ""}">Normal</button><button data-lh="1.8" class="${prefs.lh == 1.8 ? "on" : ""}">Amplio</button></div>
-    <div class="label">Tipografía</div><div class="seg"><button data-sans="0" class="${!prefs.sans ? "on" : ""}">Serif</button><button data-sans="1" class="${prefs.sans ? "on" : ""}">Sans</button></div>`);
+    <div class="label">Tipografía</div><div class="seg"><button data-sans="0" class="${!prefs.sans ? "on" : ""}">Serif</button><button data-sans="1" class="${prefs.sans ? "on" : ""}">Sans</button></div>
+    <div class="label">Tema</div><div class="seg"><button data-theme="auto" class="${prefs.theme === "auto" ? "on" : ""}">Automático</button><button data-theme="light" class="${prefs.theme === "light" ? "on" : ""}">Claro</button><button data-theme="dark" class="${prefs.theme === "dark" ? "on" : ""}">Oscuro</button></div>`);
   sh.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     if (b.dataset.fs) prefs.fs = Math.max(13, Math.min(30, prefs.fs + (+b.dataset.fs)));
     if (b.dataset.lh) { prefs.lh = +b.dataset.lh; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); }
     if (b.dataset.sans != null) { prefs.sans = b.dataset.sans === "1"; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); }
+    if (b.dataset.theme) { prefs.theme = b.dataset.theme; b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); }
     savePrefs();
   });
 });
 
+/* Alternar claro/oscuro con un toque (parte del estado actual, aunque sea automático) */
+$("#themeBtn").addEventListener("click", () => {
+  const dark = document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+  prefs.theme = dark ? "light" : "dark"; savePrefs();
+});
 /* Menú */
 $("#menuBtn").addEventListener("click", () => {
   const d = R.doc;
   const sh = openSheet(`<h2>${esc(d.name)}</h2>
     <button class="item" data-a="page">${ICON.page} Ver página original ${R.curPage}</button>
     <button class="item" data-a="note">${ICON.note} Añadir nota aquí</button>
+    <button class="item" data-a="read">${ICON.check} ${d.status === "read" ? "Marcar como por leer" : "Marcar como leído"}</button>
     <button class="item" data-a="pdf">${ICON.share} Compartir PDF anotado <small>${d.annots.length} anot.</small></button>
     <button class="item" data-a="md">${ICON.md} Compartir apuntes (Markdown)</button>
     <button class="item" data-a="copy">${ICON.copy} Copiar apuntes al portapapeles</button>`);
   sh.addEventListener("click", async e => {
     const a = e.target.closest("[data-a]")?.dataset.a; if (!a) return; closeSheet();
     if (a === "page") openPageViewer(R.curPage);
+    if (a === "read") { d.status = d.status === "read" ? "unread" : "read"; DB.putMeta(d); toast(d.status === "read" ? "Marcado como leído" : "Marcado como por leer"); }
     if (a === "note") { const bid = d.pos?.block || R.reflow.blocks[0].id; const n = { id: uid(), block: bid, s: 0, e: 0, text: "", color: "yellow", note: "", created: Date.now() }; d.annots.push(n); rerenderBlock(bid); annotSheet(n, true); }
     if (a === "pdf") await exportPdf(d);
     if (a === "md") await exportMd(d);
@@ -1076,16 +1383,39 @@ $("#menuBtn").addEventListener("click", () => {
 });
 
 /* ---------- Visor a pantalla completa con zoom (figuras y página original) ---------- */
-function openViewer({ src, canvas, title }) {
+function openViewer({ src, canvas, title }) { openGallery([{ src, canvas, title, caption: "" }], 0); }
+function openGallery(items, start = 0) {
   const v = document.createElement("div"); v.className = "viewer";
-  v.innerHTML = `<div class="vbar"><button class="icon" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="t">${esc(title || "")}</div></div><div class="stage"></div>`;
-  const stage = $(".stage", v); const el = canvas || Object.assign(new Image(), { src }); stage.appendChild(el);
-  $(".icon", v).addEventListener("click", () => v.remove());
+  v.innerHTML = `<div class="vbar"><button class="icon close" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="t"></div><div class="sub" style="font-size:13px;opacity:.8;font-variant-numeric:tabular-nums"></div></div>
+    <div class="stage"><button class="arrow l" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="arrow r" aria-label="Siguiente"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div><div class="cap" hidden></div>`;
+  const stage = $(".stage", v), cap = $(".cap", v), L = $(".arrow.l", v), Rr = $(".arrow.r", v);
   document.body.appendChild(v);
-  const fit = () => { const W = stage.clientWidth, H = stage.clientHeight, w = el.naturalWidth || el.width, h = el.naturalHeight || el.height; if (!w) return; el.style.width = w + "px"; el.style.height = h + "px"; const s = Math.min(W / w, H / h); pz.set(s, (W - w * s) / 2, (H - h * s) / 2); pz.min = s; };
-  const pz = panZoom(stage, el); if (canvas || el.complete) fit(); else el.onload = fit;
+  let i = start, el = null, pz = null, hintShown = false;
+  const fit = () => {
+    if (!el) return; const W = stage.clientWidth, H = stage.clientHeight, w = el.naturalWidth || el.width, h = el.naturalHeight || el.height; if (!w || !W) return;
+    el.style.width = w + "px"; el.style.height = h + "px";
+    const wide = w / h > 1.25 && W < H;             // tablas apaisadas: ajustar al ancho, alineadas arriba, y permitir desplazar
+    const s = wide && items[i].table ? W / w : Math.min(W / w, H / h);
+    pz.min = Math.min(s, Math.min(W / w, H / h)); pz.set(s, (W - w * s) / 2, Math.max(0, (H - h * s) / 2));
+    if (wide && !hintShown && (items[i].table || w / h > 2.2)) { hintShown = true; const hn = document.createElement("div"); hn.className = "hint"; hn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M12 3v2M12 20v1"/></svg> Gira el teléfono para verla mejor'; stage.appendChild(hn); setTimeout(() => hn.remove(), 2800); }
+  };
+  const show = () => {
+    const it = items[i]; stage.querySelectorAll("img,canvas").forEach(x => x.remove());
+    el = it.canvas || Object.assign(new Image(), { src: it.src }); el.draggable = false; stage.insertBefore(el, L);
+    pz = panZoom(stage, el, { onSwipe: d => { if (d < 0 && i < items.length - 1) { i++; show(); } else if (d > 0 && i > 0) { i--; show(); } } });
+    $(".t", v).textContent = it.title || ""; $(".sub", v).textContent = it.sub || (items.length > 1 ? `${i + 1}/${items.length}` : "");
+    cap.hidden = !it.caption; cap.innerHTML = it.caption || "";
+    L.hidden = Rr.hidden = items.length < 2; L.disabled = i === 0; Rr.disabled = i === items.length - 1;
+    if (it.canvas || el.complete) fit(); else el.onload = fit;
+  };
+  $(".close", v).addEventListener("click", () => v.remove());
+  L.addEventListener("click", e => { e.stopPropagation(); if (i > 0) { i--; show(); } });
+  Rr.addEventListener("click", e => { e.stopPropagation(); if (i < items.length - 1) { i++; show(); } });
+  const onResize = () => fit(); window.addEventListener("resize", onResize);
+  const obs = new MutationObserver(() => { if (!document.body.contains(v)) { window.removeEventListener("resize", onResize); obs.disconnect(); } }); obs.observe(document.body, { childList: true });
+  show();
 }
-function panZoom(stage, el) {
+function panZoom(stage, el, opts = {}) {
   const st = { s: 1, x: 0, y: 0, min: 0.2 };
   const apply = () => { el.style.transform = `translate(${st.x}px,${st.y}px) scale(${st.s})`; };
   st.set = (s, x, y) => { st.s = s; st.x = x; st.y = y; apply(); };
@@ -1094,12 +1424,14 @@ function panZoom(stage, el) {
   stage.addEventListener("touchmove", e => {
     e.preventDefault(); if (!t0) return; const t = snap(e);
     if (t.n === 2 && t0.n === 2) { const k = t.d / t0.d; const ns = Math.max(st.min * 0.8, Math.min(8, t0.s * k)); st.x = t.cx - (t0.cx - t0.x) * ns / t0.s; st.y = t.cy - (t0.cy - t0.y) * ns / t0.s; st.s = ns; }
-    else { st.x = t0.x + (t.cx - t0.cx); st.y = t0.y + (t.cy - t0.cy); }
+    else if (!opts.onSwipe || st.s > st.min * 1.02 || (el.height || el.naturalHeight) * st.s > stage.clientHeight) { st.x = t0.x + (t.cx - t0.cx); st.y = t0.y + (t.cy - t0.cy); }
     apply();
   }, { passive: false });
   stage.addEventListener("touchend", e => {
     if (e.touches.length === 0 && t0 && t0.n === 1 && e.changedTouches.length === 1) {
       const t = e.changedTouches[0]; const now = Date.now();
+      const r0 = stage.getBoundingClientRect(); const dx = (t.clientX - r0.left) - t0.cx, dy = (t.clientY - r0.top) - t0.cy;
+      if (opts.onSwipe && st.s <= st.min * 1.02 && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { opts.onSwipe(dx); t0 = null; return; }
       if (now - lastTap < 300 && Math.hypot(t.clientX - t0.cx, t.clientY - t0.cy) < 20) { const r = stage.getBoundingClientRect(); const px = t.clientX - r.left, py = t.clientY - r.top; const ns = st.s > st.min * 1.5 ? st.min : st.min * 2.5; st.x = px - (px - st.x) * ns / st.s; st.y = py - (py - st.y) * ns / st.s; st.s = ns; apply(); }
       lastTap = now;
     }
@@ -1222,7 +1554,7 @@ async function exportPdf(d) {
 /* ---------- Arranque ---------- */
 applyPrefs();
 renderLibrary();
-window.lector = { DB, R, openDoc, importFiles, rangeToAnnots, buildAnnotatedPdf, toMarkdown, analyzePdf, prefs };
+window.lector = { DB, R, openDoc, importFiles, rangeToAnnots, buildAnnotatedPdf, toMarkdown, analyzePdf, prefs, findPanelsInImage, pdfjsLib };
 </script>
 <script>
 if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{})); }
