@@ -148,8 +148,15 @@ article ::selection{background:rgba(31,111,99,.3);}
 .viewer .stage canvas{background:#fff;}
 
 /* Galería de paneles */
-.viewer .vbar .nav{display:flex;gap:2px;}
-.viewer .cap{background:rgba(0,0,0,.72);color:#eee;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));font-size:14px;line-height:1.4;max-height:34%;overflow:auto;font-family:-apple-system,system-ui,sans-serif;z-index:2;}
+.viewer .vbar .pillw{color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;flex:none;}
+.viewer .navbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:#111;color:#fff;z-index:2;font-family:-apple-system,system-ui,sans-serif;}
+.viewer .navbar .nb{display:inline-flex;align-items:center;gap:4px;padding:10px 14px;border-radius:12px;background:#2a2a2e;color:#fff;font-weight:600;font-size:14.5px;min-width:44px;}
+.viewer .navbar .nb[disabled]{opacity:.3;}
+.viewer .navbar .nb svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.viewer .navbar .pos{font-variant-numeric:tabular-nums;font-size:14px;opacity:.9;}
+.viewer .cap .pcap{font-size:15.5px;line-height:1.4;color:#fff;margin-bottom:6px;}
+.viewer .cap .ccap{font-size:12.5px;line-height:1.35;color:#aaa;}
+.viewer .cap{background:#000;color:#eee;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));font-size:14px;line-height:1.4;max-height:36%;overflow:auto;font-family:-apple-system,system-ui,sans-serif;z-index:2;border-top:1px solid #222;}
 .viewer .cap b{color:#fff;background:rgba(255,228,92,.25);border-radius:2px;padding:0 2px;}
 .viewer .cap .lbl{display:inline-block;background:#FFE45C;color:#3B3200;font-weight:700;border-radius:6px;padding:0 7px;margin-right:6px;}
 .viewer .arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(0,0,0,.35);border-radius:10px;z-index:3;}
@@ -253,7 +260,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs
 
 const BOLD_RE = /bold|black|heavy|semibold|demi|-medi\b|\.b\b|,b(?:old)?$/i;
 const ITALIC_RE = /italic|oblique|-ital|slant|\.i\b/i;
-const CAPTION_RE = /^(fig(?:ure|\.)?|figura|table|tabla|supplementary (?:fig|table)|scheme|box)\s*S?\d+[A-Za-z]?[\s.:|–-]/i;
+const CAPTION_RE = /^(fig(?:ure|\.)?|figura|table|tabla|supplementary (?:fig|table)|scheme|box)\s*S?\d+[A-Za-z]?[\s.:|–—-]/i;
 const REFS_RE = /^(references?|bibliography|bibliograf[ií]a|referencias|literature cited)\s*\.?$/i;
 
 async function analyzePdf(pdf, opts = {}) {
@@ -308,7 +315,10 @@ async function analyzePdf(pdf, opts = {}) {
     // un pie de figura incluye las líneas siguientes contiguas del mismo tamaño
     for (const c of captions) { capSet.add(c); let cur = c; for (;;) { const nx = nextLineBelow(pg.lines, cur); if (!nx || capSet.has(nx) || Math.abs(nx.size - cur.size) > 0.6 || (cur.y0 - nx.y1) > cur.size * 0.9 || CAPTION_RE.test(nx.text)) break; capSet.add(nx); cur = nx; } }
     const capParas0 = groupCaptions([...capSet], pg, body);
-    const textTables = detectTextTables(pg, capParas0.filter(cp => !pg.figures.some(f => Math.min(cp.x1, f.x1) - Math.max(cp.x0, f.x0) > -20 && Math.min(Math.abs(cp.y1 - f.y0), Math.abs(cp.y0 - f.y1)) < body * 6)), body);
+    const hasFig = cp => pg.figures.some(f => Math.min(cp.x1, f.x1) - Math.max(cp.x0, f.x0) > -20 && Math.min(Math.abs(cp.y1 - f.y0), Math.abs(cp.y0 - f.y1)) < body * 6);
+    const ruled = detectRuledTables(pg, capParas0.filter(cp => !hasFig(cp)), body);
+    pg.figures.push(...ruled);
+    const textTables = detectTextTables(pg, capParas0.filter(cp => !hasFig(cp) && !ruled.some(t => t.cap === cp)), body);
     pg.figures.push(...textTables);
     const flow = pg.lines.filter(l => !capSet.has(l) && !l.used);
     const leaves = xyCut(flow, body);
@@ -316,26 +326,30 @@ async function analyzePdf(pdf, opts = {}) {
     for (const leaf of leaves) paras.push(...linesToParagraphs(leaf, body, pg.p));
     // pies de figura → párrafos aparte, asociados a la figura más cercana
     const capParas = groupCaptions([...capSet], pg, body);
-    pg.figures = pg.figures.filter(f => (f.x1 - f.x0) * (f.y1 - f.y0) >= 0.08 * pg.W * pg.H || capParas.some(cp => Math.min(cp.x1, f.x1) - Math.max(cp.x0, f.x0) > -20 && Math.min(Math.abs(cp.y1 - f.y0), Math.abs(cp.y0 - f.y1)) < body * 6));
+    const nearCap = (cp, f) => (Math.min(cp.x1, f.x1) - Math.max(cp.x0, f.x0) > -20 && Math.min(Math.abs(cp.y1 - f.y0), Math.abs(cp.y0 - f.y1)) < body * 6) || (Math.min(cp.y1, f.y1) - Math.max(cp.y0, f.y0) > 0 && Math.min(Math.abs(cp.x0 - f.x1), Math.abs(cp.x1 - f.x0)) < body * 6);
+    pg.figures = pg.figures.filter(f => f.kind === "table" || (f.x1 - f.x0) * (f.y1 - f.y0) >= 0.08 * pg.W * pg.H || capParas.some(cp => nearCap(cp, f)));
     const figBlocks = pg.figures.map(f => ({ type: "fig", page: pg.p, rect: [f.x0, f.y0, f.x1, f.y1], caption: null, x0: f.x0, x1: f.x1, y0: f.y0, y1: f.y1, kind: f.kind || "figure", panels: f.panels || null }));
     for (const cp of capParas) {
       let best = null, bd = 1e9;
       for (const fb of figBlocks) {
         const overlap = Math.min(cp.x1, fb.x1) - Math.max(cp.x0, fb.x0);
-        if (overlap < -20) continue;
-        const d = Math.min(Math.abs(cp.y1 - fb.y0), Math.abs(cp.y0 - fb.y1)); // distancia vertical
+        const vOverlap = Math.min(cp.y1, fb.y1) - Math.max(cp.y0, fb.y0);
+        let d;
+        if (overlap <= 0 && vOverlap > 0) d = Math.min(Math.abs(cp.x0 - fb.x1), Math.abs(cp.x1 - fb.x0)); // al lado (pie en la columna contigua)
+        else if (overlap >= -20) d = Math.min(Math.abs(cp.y1 - fb.y0), Math.abs(cp.y0 - fb.y1));        // encima o debajo
+        else continue;
         if (d < bd) { bd = d; best = fb; }
       }
       if (best && bd < body * 6 && !best.caption) { best.caption = cp; if (/^(table|tabla)/i.test(cp.text)) best.kind = "table"; } else { cp.type = "caption"; paras.push(cp); }
     }
     // inserta cada figura antes del primer párrafo que quede por debajo de ella (misma zona horizontal)
     const ordered = [];
-    const pending = [...figBlocks];
+    const pending = [...figBlocks].sort((a, b) => b.y1 - a.y1 || a.x0 - b.x0);   // de arriba abajo, izquierda a derecha
     for (const pr of paras) {
-      for (let i = pending.length - 1; i >= 0; i--) {
+      for (let i = 0; i < pending.length;) {
         const fb = pending[i];
         const overlap = Math.min(pr.x1, fb.x1) - Math.max(pr.x0, fb.x0);
-        if (overlap > 10 && pr.y1 <= fb.y0 + body) { ordered.push(fb); pending.splice(i, 1); }
+        if (overlap > 10 && pr.y1 <= fb.y0 + body) { ordered.push(fb); pending.splice(i, 1); } else i++;
       }
       ordered.push(pr);
     }
@@ -403,7 +417,7 @@ async function analyzePdf(pdf, opts = {}) {
 /* ---------- 1. Figuras a partir del flujo de dibujo (imágenes + trazados) ---------- */
 const big = c => (c.x1 - c.x0) >= 50 && (c.y1 - c.y0) >= 30;
 function findFigures(ol, OPS, W, H) {
-  const rects = [];
+  const rects = []; const rules = [];
   let ctm = [1, 0, 0, 1, 0, 0]; const stack = [];
   const mul = (m, n) => [m[0] * n[0] + m[2] * n[1], m[1] * n[0] + m[3] * n[1], m[0] * n[2] + m[2] * n[3], m[1] * n[2] + m[3] * n[3], m[0] * n[4] + m[2] * n[5] + m[4], m[1] * n[4] + m[3] * n[5] + m[5]];
   const apply = (m, x, y) => [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
@@ -414,7 +428,8 @@ function findFigures(ol, OPS, W, H) {
     const w = r[2] - r[0], h = r[3] - r[1];
     if (!(w > 0 && h > 0)) return;
     if (w * h > pageArea * 0.85) return;                        // fondo de página
-    if (kind === "path" && (h < 1.2 || w < 1.2) && (w > W * 0.25 || h > H * 0.25)) return; // filetes / reglas
+    if (kind === "path" && h < 1.6 && w > W * 0.18) { rules.push({ x0: r[0], x1: r[2], y: (r[1] + r[3]) / 2 }); return; } // filete horizontal (tablas)
+    if (kind === "path" && (h < 1.2 || w < 1.2) && (w > W * 0.25 || h > H * 0.25)) return; // otras reglas
     if (kind === "path" && w * h > pageArea * 0.5) return;
     rects.push({ x0: Math.max(0, r[0]), y0: Math.max(0, r[1]), x1: Math.min(W, r[2]), y1: Math.min(H, r[3]), kind });
   };
@@ -437,7 +452,7 @@ function findFigures(ol, OPS, W, H) {
     }
   }
   // agrupa rectángulos que se tocan o solapan → componentes; luego componentes lado a lado → figura con paneles
-  const GAP = 10;
+  const GAP = 4;
   const near = (a, b, g) => a.x0 <= b.x1 + g && b.x0 <= a.x1 + g && a.y0 <= b.y1 + g && b.y0 <= a.y1 + g;
   const union = (a, b) => ({ x0: Math.min(a.x0, b.x0), y0: Math.min(a.y0, b.y0), x1: Math.max(a.x1, b.x1), y1: Math.max(a.y1, b.y1), n: a.n + b.n, imgs: a.imgs + b.imgs, parts: [...(a.parts || [a]), ...(b.parts || [b])] });
   const mergeAll = (list, test) => {
@@ -454,9 +469,11 @@ function findFigures(ol, OPS, W, H) {
   parts = parts.map(c => ({ x0: c.x0, y0: c.y0, x1: c.x1, y1: c.y1, n: c.n, imgs: c.imgs }));
   // paneles de una misma figura: lado a lado (o uno sobre otro) con gran solape y poca distancia
   const sideBySide = (a, b) => { const ov = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0); const hmin = Math.min(a.y1 - a.y0, b.y1 - b.y0); return ov > 0.6 * hmin && hmin > 40 && a.x0 <= b.x1 + 40 && b.x0 <= a.x1 + 40; };
-  const stacked = (a, b) => { const ov = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0); const wmin = Math.min(a.x1 - a.x0, b.x1 - b.x0); return ov > 0.6 * wmin && wmin > 50 && a.y0 <= b.y1 + 30 && b.y0 <= a.y1 + 30; };
+  const stacked = (a, b) => { const ov = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0); const wmin = Math.min(a.x1 - a.x0, b.x1 - b.x0); return ov > 0.6 * wmin && wmin > 50 && a.y0 <= b.y1 + 12 && b.y0 <= a.y1 + 12; };
   const figures = mergeAll(parts.map(c => ({ ...c, parts: [c] })), (a, b) => big(a) && big(b) && (sideBySide(a, b) || stacked(a, b)));
-  return figures.filter(c => { const w = c.x1 - c.x0, h = c.y1 - c.y0; return w >= 50 && h >= 30 && w * h >= 3000 && (c.imgs > 0 || c.n >= 4); });
+  const out = figures.filter(c => { const w = c.x1 - c.x0, h = c.y1 - c.y0; return w >= 50 && h >= 30 && w * h >= 3000 && (c.imgs > 0 || c.n >= 4); });
+  out.rules = rules;
+  return out;
 }
 
 /* ---------- 1b. Paneles (A, B, C…) dentro de una figura ---------- */
@@ -471,8 +488,14 @@ function detectPanels(f, items) {
   }
   labels.sort((a, b) => a.L.charCodeAt(0) - b.L.charCodeAt(0));
   const seq = labels.every((l, i) => l.L.charCodeAt(0) === 65 + i);
+  if (labels.length >= 2 && seq && (f.parts || []).length >= labels.length) {
+    // 1) cada etiqueta cae dentro (o al borde) de un componente distinto → ese componente es el panel
+    const bigParts0 = f.parts.filter(p => (p.x1 - p.x0) > 30 && (p.y1 - p.y0) > 30);
+    const owner = labels.map(l => bigParts0.find(p => l.x >= p.x0 - 12 && l.x <= p.x1 + 12 && l.y >= p.y0 - 12 && l.y <= p.y1 + 12));
+    if (owner.every(Boolean) && new Set(owner).size === owner.length) return labels.map((l, i) => ({ label: l.L, rect: [owner[i].x0, owner[i].y0, owner[i].x1, owner[i].y1] }));
+  }
   if (labels.length >= 2 && seq) {
-    // rejilla a partir de las posiciones de las etiquetas (suelen estar en la esquina superior izquierda de cada panel)
+    // 2) rejilla a partir de las posiciones de las etiquetas (suelen estar en la esquina superior izquierda de cada panel)
     const cluster = (vals, tol) => { const out = []; for (const v of [...vals].sort((a, b) => a - b)) { const g = out[out.length - 1]; if (g && v - g[g.length - 1] <= tol) g.push(v); else out.push([v]); } return out.map(g => g[0]); };
     const cols = cluster(labels.map(l => l.x), 25), rows = cluster(labels.map(l => l.y), 25).sort((a, b) => b - a);
     const panels = labels.map(l => {
@@ -484,7 +507,7 @@ function detectPanels(f, items) {
     if (panels.every(p => p.rect[2] - p.rect[0] > 30 && p.rect[3] - p.rect[1] > 30)) return panels;
   }
   // sin etiquetas: componentes grandes separados (viñetas sin letra)
-  const bigParts = (f.parts || []).filter(p => (p.x1 - p.x0) * (p.y1 - p.y0) >= 0.12 * (f.x1 - f.x0) * (f.y1 - f.y0) && (p.x1 - p.x0) > 40 && (p.y1 - p.y0) > 40);
+  const bigParts = (f.parts || []).filter(p => p.imgs > 0 && (p.x1 - p.x0) * (p.y1 - p.y0) >= 0.12 * (f.x1 - f.x0) * (f.y1 - f.y0) && (p.x1 - p.x0) > 40 && (p.y1 - p.y0) > 40);
   if (bigParts.length >= 2 && bigParts.length <= 12) {
     bigParts.sort((a, b) => (Math.abs(a.y1 - b.y1) > 20 ? b.y1 - a.y1 : a.x0 - b.x0));
     return bigParts.map((p, i) => ({ label: String(i + 1), rect: [p.x0, p.y0, p.x1, p.y1] }));
@@ -524,28 +547,64 @@ function splitCaption(text, labels) {
   if (hit < Math.max(2, labels.length - 1)) return null;
   return { common: text.slice(0, toks[0].start).trim(), per };
 }
-/* Tablas sin filetes: región de líneas "tabulares" junto a un pie "Table N" que no tiene figura asociada */
+/* Tablas con filetes horizontales (estilo AJR/Radiology/JVIR): filete superior … filete inferior con texto entre medias */
+function detectRuledTables(pg, capParas, body) {
+  const out = []; const rules = (pg.figures.rules || []).filter(r => r.x1 - r.x0 > pg.W * 0.18 && r.y > pg.H * 0.08 && r.y < pg.H * 0.92).sort((a, b) => b.y - a.y);
+  if (rules.length < 2) return out;
+  // pilas de filetes con el mismo ancho aproximado
+  const stacks = [];
+  for (const r of rules) {
+    const st = stacks.find(st => Math.min(st.x1, r.x1) - Math.max(st.x0, r.x0) > 0.8 * Math.min(st.x1 - st.x0, r.x1 - r.x0) && st.yMin - r.y < body * 30);
+    if (st) { st.rules.push(r); st.yMin = Math.min(st.yMin, r.y); st.x0 = Math.min(st.x0, r.x0); st.x1 = Math.max(st.x1, r.x1); } else stacks.push({ rules: [r], yMin: r.y, yMax: r.y, x0: r.x0, x1: r.x1 });
+  }
+  for (const st of stacks) {
+    if (st.rules.length < 2) continue;
+    const top = st.yMax, bottom = st.yMin;
+    const inside = pg.lines.filter(l => !l.used && l.base < top && l.base > bottom && Math.min(l.x1, st.x1) - Math.max(l.x0, st.x0) > 5);
+    if (inside.length < 3) continue;
+    // pie "Table N" justo encima (o debajo) de la pila
+    const cap = capParas.find(cp => /^(table|tabla)/i.test(cp.text) && Math.min(cp.x1, st.x1) - Math.max(cp.x0, st.x0) > -20 && (Math.abs(cp.y0 - top) < body * 4 || Math.abs(cp.y1 - bottom) < body * 4));
+    if (!cap && st.rules.length < 3) continue;
+    if (!cap && top - bottom > pg.H * 0.6) continue;                                      // una "tabla" de página entera sin pie no es una tabla
+    // si la zona coincide con una figura (ejes de gráficas, filetes de diagramas), no es tabla
+    const area = (st.x1 - st.x0) * (top - bottom);
+    if (pg.figures.some(f => { const ov = Math.max(0, Math.min(f.x1, st.x1) - Math.max(f.x0, st.x0)) * Math.max(0, Math.min(f.y1, top) - Math.max(f.y0, bottom)); return ov > 0.3 * Math.min(area, (f.x1 - f.x0) * (f.y1 - f.y0)); })) continue;
+    // notas al pie de la tabla: texto pequeño justo debajo del filete inferior
+    const foot = []; let prevY = bottom;
+    for (const l of pg.lines.filter(l => !l.used && l.base < bottom && l.size < body * 0.95 && Math.min(l.x1, st.x1) - Math.max(l.x0, st.x0) > 5).sort((a, b) => b.base - a.base)) { if (prevY - l.y1 > body * 1.6) break; foot.push(l); prevY = l.y0; }
+    for (const l of [...inside, ...foot]) l.used = true;
+    const all = [...inside, ...foot];
+    const rect = [Math.min(st.x0, ...all.map(l => l.x0)) - 2, Math.min(bottom, ...all.map(l => l.y0)) - 2, Math.max(st.x1, ...all.map(l => l.x1)) + 2, Math.max(top, ...all.map(l => l.y1)) + 2];
+    out.push({ x0: rect[0], y0: rect[1], x1: rect[2], y1: rect[3], n: 0, imgs: 0, parts: [], kind: "table", cap });
+  }
+  return out;
+}
+/* Tablas sin filetes: filas de fragmentos alineados en columnas junto a un pie "Table N" */
 function detectTextTables(pg, capParas, body) {
   const out = [];
-  const tabular = l => { if (l.items.length >= 3) { let big = 0; for (let i = 1; i < l.items.length; i++) if (l.items[i].x0 - l.items[i - 1].x1 > 1.2 * l.size) big++; if (big >= 2) return true; } return false; };
   for (const cp of capParas) {
     if (!/^(table|tabla)/i.test(cp.text)) continue;
-    const span = [cp.x0, cp.x1];
-    for (const dir of [-1, 1]) {   // -1: líneas por debajo del pie; +1: por encima
-      const cand = pg.lines.filter(l => !l.used && !capParas.some(c => c.lines.includes(l)) && Math.min(l.x1, span[1] + 40) - Math.max(l.x0, span[0] - 40) > 20 && (dir < 0 ? l.y1 <= cp.y0 + 2 : l.y0 >= cp.y1 - 2))
-        .sort((a, b) => dir < 0 ? b.base - a.base : a.base - b.base);
-      const taken = []; let prev = cp, nTab = 0;
-      for (const l of cand) {
-        const gap = dir < 0 ? prev.y0 - l.y1 : l.y0 - prev.y1;
-        if (gap > body * 2.2) break;
-        const isTab = tabular(l), small = l.size < body * 0.95, short = (l.x1 - l.x0) < (span[1] - span[0]) * 0.75;
+    const span = [cp.x0 - 40, cp.x1 + 40];
+    for (const dir of [-1, 1]) {   // -1: filas por debajo del pie; +1: por encima
+      const cand = pg.lines.filter(l => !l.used && !capParas.some(c => c.lines.includes(l)) && Math.min(l.x1, span[1]) - Math.max(l.x0, span[0]) > 5 && (dir < 0 ? l.y1 <= cp.y0 + 2 : l.y0 >= cp.y1 - 2));
+      // agrupa por línea base (una fila de tabla = varios fragmentos separados a la misma altura)
+      const rows = [];
+      for (const l of [...cand].sort((a, b) => dir < 0 ? b.base - a.base : a.base - b.base)) { const r = rows[rows.length - 1]; if (r && Math.abs(r.base - l.base) < l.size * 0.5) { r.lines.push(l); r.y0 = Math.min(r.y0, l.y0); r.y1 = Math.max(r.y1, l.y1); } else rows.push({ base: l.base, lines: [l], y0: l.y0, y1: l.y1 }); }
+      const taken = []; let prev = cp, nTab = 0, gapSince = 0;
+      for (const r of rows) {
+        const gap = dir < 0 ? prev.y0 - r.y1 : r.y0 - prev.y1;
+        if (gap > body * 2.5) break;
+        const frags = r.lines.length; const width = Math.max(...r.lines.map(l => l.x1)) - Math.min(...r.lines.map(l => l.x0));
+        const isTab = frags >= 2 && width > (cp.x1 - cp.x0) * 0.35;
+        const small = r.lines.every(l => l.size < body * 0.95), short = width < (cp.x1 - cp.x0) * 0.7 && frags === 1;
         if (!isTab && !small && !short) break;                     // vuelve la prosa
-        if (!isTab && !short && nTab === 0) break;
-        taken.push(l); if (isTab) nTab++; prev = l;
+        if (!isTab) { gapSince++; if (gapSince > 4 && nTab === 0) break; } else { gapSince = 0; nTab++; }
+        taken.push(r); prev = r;
       }
+      while (taken.length && !taken[taken.length - 1].lines.some(l => l.size < body * 0.95) && taken[taken.length - 1].lines.length < 2 && nTab) taken.pop();
       if (nTab >= 2) {
-        for (const l of taken) l.used = true;
-        const rect = [Math.min(cp.x0, ...taken.map(l => l.x0)) - 2, Math.min(cp.y0, ...taken.map(l => l.y0)) - 2, Math.max(cp.x1, ...taken.map(l => l.x1)) + 2, Math.max(cp.y1, ...taken.map(l => l.y1)) + 2];
+        const ls = taken.flatMap(r => r.lines); for (const l of ls) l.used = true;
+        const rect = [Math.min(...ls.map(l => l.x0)) - 2, Math.min(...ls.map(l => l.y0)) - 2, Math.max(...ls.map(l => l.x1)) + 2, Math.max(...ls.map(l => l.y1)) + 2];
         out.push({ x0: rect[0], y0: rect[1], x1: rect[2], y1: rect[3], n: 0, imgs: 0, parts: [], kind: "table", cap: cp });
         break;
       }
@@ -1153,7 +1212,7 @@ async function figureEl(b) {
   fig.innerHTML = `<div class="wrap">${src ? `<img class="fig" src="${src}" alt="${esc(label)} de la página ${b.page}"><span class="kind">${esc(label)}${panels ? " · " + panels.length + " paneles" : ""}</span><span class="zoomhint">${isTable ? "Abrir tabla" : "Ampliar"}</span>` : `<div class="fig nomatch">${esc(label)} de la página ${b.page} (ver página original)</div>`}</div>
     ${strip}
     ${b.caption ? `<figcaption class="tx" data-b="${b.id}c">${textHtml({ text: b.caption, spans: b.captionSpans || [] }, b.id + "c")}</figcaption>` : ""}`;
-  $(".wrap", fig).addEventListener("click", () => src ? openFigure(b, -1) : openPageViewer(b.page));
+  $(".wrap", fig).addEventListener("click", () => src ? openFigure(b, 0) : openPageViewer(b.page));
   fig.querySelectorAll(".panelstrip button").forEach(bt => bt.addEventListener("click", () => openFigure(b, +bt.dataset.i)));
   return fig;
 }
@@ -1162,23 +1221,24 @@ async function imgUrl(key, has) {
   const blob = await DB.getImage(key); if (!blob) return null;
   const u = URL.createObjectURL(blob); R.urls.push(u); return u;
 }
-/* Abre una figura en la galería: la figura completa y, si tiene paneles, cada panel con su parte del pie */
+/* Abre una figura en la galería: con viñetas, una por pantalla con su parte del pie; "Completa" muestra la figura entera */
 async function openFigure(b, index) {
   const isTable = b.kind === "table";
-  const items = [];
   const full = await imgUrl(`${R.doc.id}/${b.id}`, b.img);
-  const kindLabel = isTable ? "Tabla" : "Figura";
-  const title = b.caption ? b.caption.slice(0, 70) : `${kindLabel} · p. ${b.page}`;
-  items.push({ src: full, title, caption: b.caption ? esc(b.caption) : "", table: isTable });
+  const num = b.caption?.match(/^(?:fig(?:ure|\.)?|figura|table|tabla)\s*S?\d+[A-Za-z]?/i)?.[0] || (isTable ? "Tabla" : "Figura");
+  const common = b.captionCommon || b.caption || "";
+  const items = [];
   if (!isTable && b.panels) {
     for (let i = 0; i < b.panels.length; i++) {
       const pn = b.panels[i]; const src = await imgUrl(`${R.doc.id}/${b.id}/p${i}`, pn.img); if (!src) continue;
-      let cap = b.caption ? esc(b.caption) : "";
-      if (pn.caption && b.caption) { const k = b.caption.indexOf(pn.caption); if (k >= 0) cap = esc(b.caption.slice(0, k)) + "<b>" + esc(pn.caption) + "</b>" + esc(b.caption.slice(k + pn.caption.length)); }
-      items.push({ src, title: `${title}`, caption: `<span class="lbl">${esc(pn.label)}</span>` + cap, sub: `${pn.label} · ${i + 1}/${b.panels.length}` });
+      const own = pn.caption ? `<div class="pcap"><span class="lbl">${esc(pn.label)}</span>${esc(pn.caption)}</div>` : `<div class="pcap"><span class="lbl">${esc(pn.label)}</span></div>`;
+      const rest = pn.caption ? `<div class="ccap">${esc(common)}</div>` : `<div class="ccap">${esc(b.caption || "")}</div>`;
+      items.push({ src, title: `${num} · p. ${b.page}`, sub: `${pn.label} · ${i + 1}/${b.panels.length}`, caption: own + rest });
     }
   }
-  openGallery(items, index < 0 ? 0 : index + 1);
+  const fullItem = { src: full, title: `${num} · p. ${b.page}`, sub: isTable ? "" : "Completa", caption: b.caption ? `<div class="ccap">${esc(b.caption)}</div>` : "", table: isTable };
+  if (!items.length) { openGallery([fullItem], 0); return; }
+  openGallery(items, Math.max(0, index), fullItem);
 }
 /* Texto de un bloque → HTML con negritas/cursivas/superíndices y subrayados, sin alterar los caracteres */
 function textHtml(b, bid) {
@@ -1384,33 +1444,38 @@ $("#menuBtn").addEventListener("click", () => {
 
 /* ---------- Visor a pantalla completa con zoom (figuras y página original) ---------- */
 function openViewer({ src, canvas, title }) { openGallery([{ src, canvas, title, caption: "" }], 0); }
-function openGallery(items, start = 0) {
+function openGallery(items, start = 0, fullItem = null) {
   const v = document.createElement("div"); v.className = "viewer";
-  v.innerHTML = `<div class="vbar"><button class="icon close" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="t"></div><div class="sub" style="font-size:13px;opacity:.8;font-variant-numeric:tabular-nums"></div></div>
-    <div class="stage"><button class="arrow l" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="arrow r" aria-label="Siguiente"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div><div class="cap" hidden></div>`;
-  const stage = $(".stage", v), cap = $(".cap", v), L = $(".arrow.l", v), Rr = $(".arrow.r", v);
+  v.innerHTML = `<div class="vbar"><button class="icon close" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="t"></div>${fullItem ? '<button class="pillw full">Ver completa</button>' : ""}</div>
+    <div class="stage"></div>
+    <div class="navbar" hidden><button class="nb prev"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg> Anterior</button><div class="pos"></div><button class="nb next">Siguiente <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button></div>
+    <div class="cap" hidden></div>`;
+  const stage = $(".stage", v), cap = $(".cap", v), nav = $(".navbar", v), prev = $(".prev", v), next = $(".next", v), pos = $(".pos", v), fullBtn = $(".full", v);
   document.body.appendChild(v);
-  let i = start, el = null, pz = null, hintShown = false;
+  let i = start, el = null, pz = null, hintShown = false, showingFull = false;
+  const cur = () => showingFull ? fullItem : items[i];
   const fit = () => {
     if (!el) return; const W = stage.clientWidth, H = stage.clientHeight, w = el.naturalWidth || el.width, h = el.naturalHeight || el.height; if (!w || !W) return;
     el.style.width = w + "px"; el.style.height = h + "px";
-    const wide = w / h > 1.25 && W < H;             // tablas apaisadas: ajustar al ancho, alineadas arriba, y permitir desplazar
-    const s = wide && items[i].table ? W / w : Math.min(W / w, H / h);
+    const it = cur(); const wide = w / h > 1.25 && W < H;
+    const s = wide && it.table ? W / w : Math.min(W / w, H / h);
     pz.min = Math.min(s, Math.min(W / w, H / h)); pz.set(s, (W - w * s) / 2, Math.max(0, (H - h * s) / 2));
-    if (wide && !hintShown && (items[i].table || w / h > 2.2)) { hintShown = true; const hn = document.createElement("div"); hn.className = "hint"; hn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M12 3v2M12 20v1"/></svg> Gira el teléfono para verla mejor'; stage.appendChild(hn); setTimeout(() => hn.remove(), 2800); }
+    if (wide && !hintShown && (it.table || w / h > 2.2)) { hintShown = true; const hn = document.createElement("div"); hn.className = "hint"; hn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M12 3v2M12 20v1"/></svg> Gira el teléfono para verla mejor'; stage.appendChild(hn); setTimeout(() => hn.remove(), 2800); }
   };
   const show = () => {
-    const it = items[i]; stage.querySelectorAll("img,canvas").forEach(x => x.remove());
-    el = it.canvas || Object.assign(new Image(), { src: it.src }); el.draggable = false; stage.insertBefore(el, L);
-    pz = panZoom(stage, el, { onSwipe: d => { if (d < 0 && i < items.length - 1) { i++; show(); } else if (d > 0 && i > 0) { i--; show(); } } });
-    $(".t", v).textContent = it.title || ""; $(".sub", v).textContent = it.sub || (items.length > 1 ? `${i + 1}/${items.length}` : "");
-    cap.hidden = !it.caption; cap.innerHTML = it.caption || "";
-    L.hidden = Rr.hidden = items.length < 2; L.disabled = i === 0; Rr.disabled = i === items.length - 1;
+    const it = cur(); stage.querySelectorAll("img,canvas").forEach(x => x.remove());
+    el = it.canvas || Object.assign(new Image(), { src: it.src }); el.draggable = false; stage.appendChild(el);
+    pz = panZoom(stage, el, { onSwipe: d => { if (showingFull) return; if (d < 0 && i < items.length - 1) { i++; show(); } else if (d > 0 && i > 0) { i--; show(); } } });
+    $(".t", v).textContent = it.title || "";
+    cap.hidden = !it.caption; cap.innerHTML = it.caption || ""; cap.scrollTop = 0;
+    nav.hidden = showingFull || items.length < 2; prev.disabled = i === 0; next.disabled = i === items.length - 1; pos.textContent = it.sub || `${i + 1}/${items.length}`;
+    if (fullBtn) fullBtn.textContent = showingFull ? "Ver viñetas" : "Ver completa";
     if (it.canvas || el.complete) fit(); else el.onload = fit;
   };
   $(".close", v).addEventListener("click", () => v.remove());
-  L.addEventListener("click", e => { e.stopPropagation(); if (i > 0) { i--; show(); } });
-  Rr.addEventListener("click", e => { e.stopPropagation(); if (i < items.length - 1) { i++; show(); } });
+  prev.addEventListener("click", () => { if (i > 0) { i--; show(); } });
+  next.addEventListener("click", () => { if (i < items.length - 1) { i++; show(); } });
+  fullBtn?.addEventListener("click", () => { showingFull = !showingFull; show(); });
   const onResize = () => fit(); window.addEventListener("resize", onResize);
   const obs = new MutationObserver(() => { if (!document.body.contains(v)) { window.removeEventListener("resize", onResize); obs.disconnect(); } }); obs.observe(document.body, { childList: true });
   show();
